@@ -9,7 +9,7 @@ int main(int argc, char* argv[]){
 
   int M = 1e4;
   int N = 1e2;
-  vector<double> counter(N,0);
+  ofstream out;
   Statistic mystat;
 
   // PARTE 1
@@ -19,13 +19,21 @@ int main(int argc, char* argv[]){
   mystat.blocking(M, N, "../../Results/results.dat");
 
   // PARTE 2
+  // N = 100 volte
   // calcolo del chi quadro: genero M valori e divido lo spazio campione in N sezioni
   // calcolo chiquad usando i campionamenti di ogni sezione messi a confronto con il valore atteso
-  for(int i=0; i<M; i++){
-    int rand = int(mystat.uniform_sampling(0,1)*100);
-    counter.at(rand)++;
-  }
 
-  cout << "Il chi quadro calcolato è: " << mystat.chiquad(counter, M/N, true) << endl;
+  out.open("../../Results/chiquad.dat", ios::out | ios::trunc);
+  for(int j=0; j<N; j++){
+    vector<double> counter(N,0);
+    for(int i=0; i<M; i++){
+      int rand = int(mystat.uniform_sampling(0,1)*100);
+      counter.at(rand)++;
+    }
+    out << mystat.chiquad(counter, M/N, true) << endl;        // stampo così da plottare
+  }                                                           // l'istogramma
+
+  out.close();
+
   return 0;
 }

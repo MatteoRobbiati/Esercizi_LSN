@@ -83,16 +83,12 @@ double Statistic::mean(vector<double> vec){
 }
 
 double Statistic::chiquad(vector<double> vec, double EV, bool approx){
-  ofstream out;
-  out.open("../../Results/chiquad.dat");
   double chiq=0;
   if(approx==true){
     for(unsigned int i=0; i<vec.size(); i++){
       chiq+=pow((vec.at(i)-EV),2)/EV;
-      out << vec.at(i) << endl;
     }
   }
   else cout << "Per applicare il chi-quadro senza approssimazione utilizzare il metodo che coinvolge le incertezze sulle misure " << endl;
-  out.close();
   return chiq;
 }
