@@ -15,9 +15,14 @@ int main(int argc, char* argv[]){
   Random rnd;
   Statistic mystat;
   BaseFunction *f = new MyCos();
-  Measure *I = new Integrate(0,1,atoi(argv[3]), f, rnd);
+  Measure *I = new Integrate(0,1,atoi(argv[3]), f, "uniform sampling", rnd);
 
-  mystat.blocking(atoi(argv[1]),atoi(argv[2]),I,"../../Results/uniform_sampling.dat");
+  mystat.blocking(atoi(argv[1]),atoi(argv[2]),I, "../../Results/uniform_sampling.dat");
+
+  f = new MyGeneral();
+  I = new Integrate(0,1,atoi(argv[3]), f, "importance sampling", rnd);
+
+  mystat.blocking(atoi(argv[1]),atoi(argv[2]),I, "../../Results/importance_sampling.dat");
 
   return 0;
 }
