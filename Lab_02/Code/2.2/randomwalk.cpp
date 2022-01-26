@@ -92,10 +92,17 @@ vector<double> RandomWalk::get_measure(){
   vector<double> step_distance(_N,0);       // in each slot the sum of _N dist reached at that step
   walker_at_home();
 
+  if(_metric=="discrete"){
     for(int step=0; step<_N; step++){
       make_discrete_step();
       step_distance.at(step)+=get_squared_mod();
     }
+  }if(_metric=="continuum"){
+    for(int step=0; step<_N; step++){
+      make_continuum_step();
+      step_distance.at(step)+=get_squared_mod();
+    }
+  }
   for(int k=0; k<_N; k++) step_distance.at(k)=step_distance.at(k);
   return step_distance;
 }
