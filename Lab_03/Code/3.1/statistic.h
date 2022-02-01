@@ -19,11 +19,12 @@ class Statistic: public Random{
   public:
     Statistic();
     ~Statistic();
-
+    
     void blocking(int M, int N, Measure* measure, const char* filename);
     double error(double val, double val2, unsigned int k);
     double chiquad(vector<double> vec,double, bool approx);
     double mean(vector<double> vec);
+    double uniform_sampling(int min, int max);
 };
 
 #endif

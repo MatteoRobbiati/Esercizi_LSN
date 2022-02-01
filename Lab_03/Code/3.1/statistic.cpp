@@ -32,8 +32,9 @@ void Statistic::blocking(int M, int N, Measure *measure, const char* filename){
     for(int j=0; j<dim; j++){
       sum.at(j)+=meas.at(j)/L;
       sum2.at(j)+=(meas.at(j)/L)*(meas.at(j)/L);
-      out << sqrt(sum.at(j)/(i+1)) << "   " << (error(sum.at(j)/(i+1), sum2.at(j)/(i+1), i)/sqrt(N))/(2*sqrt(sum.at(j)/(i+1))) << endl;
+      out << sum.at(j)/(i+1) << "   " << error(sum.at(j)/(i+1), sum2.at(j)/(i+1), i) << "   ";
     }
+    out << endl;
   }
   out.close();
   return;
@@ -41,9 +42,11 @@ void Statistic::blocking(int M, int N, Measure *measure, const char* filename){
 
 
 
-
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ funzioni generiche ~~~~~~~~~~~~~~~~
 
+double Statistic::uniform_sampling(int min, int max){
+  return _rnd.Rannyu(min,max);
+}
 
 double Statistic::error(double val, double val2, unsigned int k){
   if(k==0) return 0;

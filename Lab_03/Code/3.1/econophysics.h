@@ -19,12 +19,10 @@ class EconoPhysics : public Random, public Measure{
     EconoPhysics(double asset, double period, double rate, double strike, double volatility, string method, Random rnd);
     ~EconoPhysics();
 
-    double call_option(double t);
-    //double put();
-    double d1_at(double t);
-    double d2_at(double t);
+    vector<double> european_options(double t);
     double price_at(double t);
     double N(double d);
+    void save_Black_Scholes_solution(string filename);
 
     vector<double> get_measure();                        // concrete implementation of Measure
     int get_dimension();
