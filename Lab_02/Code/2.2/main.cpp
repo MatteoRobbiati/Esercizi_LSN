@@ -1,4 +1,4 @@
-#include <iostream>
+y#include <iostream>
 #include "randomwalk.h"
 #include "statistic.h"
 #include "random.h"
