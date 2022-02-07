@@ -20,12 +20,12 @@ using namespace std;
 
 int main(){
 
-  int M = 1e5;
+  int M = 1e4;
   int N = 100;
   string filename = "ave_results_gas.dat";
 
-  Equilibrate_system();
   Input();
+  if(restart=="true") Equilibrate_system();
   blocking_on_MD(M, N, filename);
   ConfFinal();
 
@@ -159,13 +159,12 @@ void Equilibrate_system(){
   cout << "Running 10000 steps that will be ignored at the end of this phase." << endl << endl;
   cout << "####################################################################" << endl;
 
-  Input();
-  for(int i=0; i<50000; i++){
-    if((i+1)%2500==0){
-      cout << "Thermalization process is running, step " << i+1 << "/50000. Rescaling velocities." << endl;
+  for(int i=0; i<100000; i++){
+    if((i+1)%1000==0){
+      cout << "Thermalization process is running, step " << i+1 << "/20000. Rescaling velocities." << endl;
       rescale_velocities();
     }
-    if(i%250==0) Measure(true);
+    if(i%10==0) Measure(true);
     Move();
   }
   set_restart("true","false");
@@ -211,7 +210,8 @@ void blocking_on_MD(int M, int N, string filename){
     vector<double> meas(n_props,0);
     for(int k=0; k<L; k++){
       Move();
-      Measure(true);
+      if(k%10==0) Measure(true);
+      else        Measure(false);
       meas.at(iv)+=stima_pot;
       meas.at(ik)+=stima_kin;
       meas.at(ie)+=stima_etot;
