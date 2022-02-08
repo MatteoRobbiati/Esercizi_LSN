@@ -12,6 +12,11 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 using namespace std;
 
 const int m_props=4;
+const double K_B = 1.380649e-23;
+const double sigma = 0.34e-9;
+const double mass = 39.948*1.66054e-27;
+const double epsilon_on_K_B = 120;
+
 int n_props;
 int iv,ik,it,ie;
 double stima_pot, stima_kin, stima_etot, stima_temp;
@@ -36,7 +41,7 @@ double delta;
 //blocking
 
 void blocking_on_MD(int, int, string);
-double error(double, double, string);
+double error(double, double, unsigned int);
 
 //functions
 void Equilibrate_system();

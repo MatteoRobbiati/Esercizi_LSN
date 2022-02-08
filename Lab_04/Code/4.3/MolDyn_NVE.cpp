@@ -19,21 +19,15 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 using namespace std;
 
 int main(){
-  Equilibrate_system();
-  Input();
-  int nconf = 1;
-  bool print_istant = true;
 
-  for(int istep=1; istep <= nstep; ++istep){
-     Move();
-     if(istep%iprint == 0) cout << "Number of time-steps: " << istep << endl;
-     if(istep%10 == 0){
-        Measure(print_istant);     //Properties measurement
-//        ConfXYZ(nconf);//Write actual configuration in XYZ format //Commented to avoid "filesystem full"!
-        nconf += 1;
-     }
-  }
-  ConfFinal();         //Write final configuration to restart
+  int M = 1e4;
+  int N = 100;
+  string filename = "ave_results_gas.dat";
+
+  Input();
+  if(restart=="true") Equilibrate_system();
+  blocking_on_MD(M, N, filename);
+  ConfFinal();
 
   return 0;
 }
@@ -165,13 +159,12 @@ void Equilibrate_system(){
   cout << "Running 10000 steps that will be ignored at the end of this phase." << endl << endl;
   cout << "####################################################################" << endl;
 
-  Input();
-  for(int i=0; i<5000; i++){
+  for(int i=0; i<100000; i++){
     if((i+1)%1000==0){
-      cout << "Thermalization process is running, step " << i+1 << "/10000. Rescaling velocities." << endl;
+      cout << "Thermalization process is running, step " << i+1 << "/20000. Rescaling velocities." << endl;
       rescale_velocities();
     }
-    if(i%10==0) Measure();
+    if(i%10==0) Measure(true);
     Move();
   }
   set_restart("true","false");
@@ -207,17 +200,18 @@ void blocking_on_MD(int M, int N, string filename){
 
   ofstream out;
   int L = M/N;
-  out.open(filename, ios::out || ios::trunc);
+  out.open(filename, ios::out | ios::trunc);
   vector<double> sum(n_props,0);        // n_props index for n_props-dim measures
-  vector<double> sum(n_props,0);
+  vector<double> sum2(n_props,0);
 
   cout << "Starting simulation with blocking. " << endl;
-  for(int i=0; i<N; i++){
+  for(unsigned int i=0; i<N; i++){
     if((i+1)%25) cout << "Running block " << i << " of " << N << endl;
     vector<double> meas(n_props,0);
     for(int k=0; k<L; k++){
       Move();
-      Measure(false);
+      if(k%10==0) Measure(true);
+      else        Measure(false);
       meas.at(iv)+=stima_pot;
       meas.at(ik)+=stima_kin;
       meas.at(ie)+=stima_etot;
@@ -330,9 +324,10 @@ void Measure(bool print_istant){ //Properties measurement
   int bin;
   double v, t, vij;
   double dx, dy, dz, dr;
+  ofstream Epot, Ekin, Etot, Temp;
+
 
   if(print_istant==true){
-    ofstream Epot, Ekin, Etot, Temp;
 
     Epot.open("output_epot.dat",ios::app);
     Ekin.open("output_ekin.dat",ios::app);
@@ -366,10 +361,10 @@ void Measure(bool print_istant){ //Properties measurement
 //Kinetic energy
   for (int i=0; i<npart; ++i) t += 0.5 * (vx[i]*vx[i] + vy[i]*vy[i] + vz[i]*vz[i]);
 
-  stima_pot = v/(double)npart; //Potential energy per particle
-  stima_kin = t/(double)npart; //Kinetic energy per particle
-  stima_temp = (2.0 / 3.0) * t/(double)npart; //Temperature
-  stima_etot = (t+v)/(double)npart; //Total energy per particle
+  stima_pot  = (v/(double)npart); //Potential energy per particle
+  stima_kin  = (t/(double)npart); //Kinetic energy per particle
+  stima_temp = ((2.0 / 3.0) * t/(double)npart); //Temperature
+  stima_etot = ((t+v)/(double)npart); //Total energy per particle
 
   if(print_istant==true){
     Epot << stima_pot  << endl;
