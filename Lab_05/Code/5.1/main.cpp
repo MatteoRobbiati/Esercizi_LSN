@@ -1,37 +1,35 @@
 #include <iostream>
-#include "econophysics.h"
-#include "statistic.h"
+#include "metropolis.h"
+#include "pdf.h"
+#include "position.h"
+#include <string>
 #include "random.h"
 #include "measure.h"
 
+using namespace std;
 
 int main(int argc, char* argv[]){
 
 
   int M = 1e5;
-  int N = 100;
-  double asset = 100.;
-  double strike = 100.;
-  double period = 1.;
-  double rate = 0.1;
-  double volatility = 0.25;
-  string method [] = {"direct", "step by step"};
+  double step_100 = 1.235;
+  double step_210 = 4.95;
+  Random* rnd = new Random();
+  rnd->Init();
+  Position *start = new Position(100.,100.,100., rnd);
+  vector<double> coord = start->get_coordinates();
 
-  Random rnd;
-  Statistic mystat;
-  EconoPhysics MyEco(asset, period, rate, strike, volatility, method[0], rnd);
+  pdf *hydrogen = new hydro_100();
+  Metropolis *MyMetro = new Metropolis(M, hydrogen, start, rnd, step_100, "uniform");
+  MyMetro->run("../../Results/H100.dat");
+  cout << "rate hydrogen |100>: " << MyMetro->rate_of_acceptance() << endl;
 
-  //~~~~~~~~~~~~~~~~ analytic's solutions ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  start->set_coordinates(coord);
 
-  MyEco.save_Black_Scholes_solution("../../Results/solutions.dat");
-
-  // ~~~~~~~~~~~~~~ simulations ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  Measure *options = new EconoPhysics(asset, period, rate, strike, volatility, method[0], rnd);
-  mystat.blocking(M, N, options, "../../Results/direct_opt.dat");
-
-  options = new EconoPhysics(asset, period, rate, strike, volatility, method[1], rnd);
-  mystat.blocking(M, N, options, "../../Results/bystep_opt.dat");
+  hydrogen = new hydro_210();
+  Metropolis *Metro_210 = new Metropolis(M, hydrogen, start, rnd, step_210, "uniform");
+  Metro_210->run("../../Results/H210.dat");
+  cout << "rate hydrogen |210>: " << Metro_210->rate_of_acceptance() << endl;
 
   return 0;
 }
