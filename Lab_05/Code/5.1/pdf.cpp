@@ -8,5 +8,6 @@ double hydro_100::eval(Position *pos){
 }
 
 double hydro_210::eval(Position *pos){
-	return 1./64.*(sqrt(2./M_PI))*(pos->get_radius())*exp(-(pos->get_radius())/2.)*cos(pos->get_theta());
+	vector<double> coord = pos->get_coordinates();
+	return (1./(32.*M_PI))*(coord.at(2)*coord.at(2))*exp(-(pos->get_radius()));
 }

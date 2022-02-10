@@ -64,10 +64,12 @@ double Metropolis::rate_of_acceptance(){
   return double(_accepted)/double(_attempted);
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~ concrete implementation of measure ~~~~~~~~~~~~~~~~~~~~~
+
 vector<double> Metropolis::get_measure(){
   try_step();
   vector<double> meas;
-  meas.push_back(p_function->eval(_x));
+  meas.push_back(_x->get_radius());
   return meas;
 }
 
