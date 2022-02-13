@@ -24,6 +24,7 @@ void Statistic::blocking(int M, int N, Measure *measure, const char* filename){
   vector<double> sum2(dim,0);
 
   for(int i=0; i<N; i++){
+    if(i%10==0) cout << "Running block " << i+1 << "/100, please waiting :)" << endl;
     vector<double> meas(dim,0);
     for(int k=0; k<L; k++){
       vector<double> onethrow = measure->get_measure();

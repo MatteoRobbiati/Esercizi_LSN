@@ -4,25 +4,30 @@
 #include "random.h"
 #include "position.h"
 #include "pdf.h"
+#include "measure.h"
+#include <string>
+#include <vector>
 
 using namespace std;
 
-class Metropolis : public Measure, public pdf{
+class Metropolis : public Measure{
   private:
-    int _steps, _accepted;                            // number of steps, counter of accepted steps
+    int _steps, _accepted;                        // number of steps, counter of accepted steps
+    double _stepsize;
     pdf *p_function;                              // density function
-    Position *_xold;                              // x_old
     Position *_x;                                 // x_new
-    Random _rnd;
+    Random* _rnd;
+    int _attempted;
+    string _method;
 
   public:
-    Metropolis(int N, pdf *mypdf, Position *start, Random rnd);
+    Metropolis(int N, pdf *mypdf, Position *start, Random* rnd, double stepsize, string method);
     ~Metropolis();
-    double T_uni();
-    //double T_gauss();
-    double A_eval();
-    void make_step();
-    void walker_at_home();
+    void try_step();
+    void run(string filename);
+    double rate_of_acceptance();
+    vector<double> get_measure();
+    int get_dimension();
 };
 
 #endif

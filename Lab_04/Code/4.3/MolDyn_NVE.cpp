@@ -20,7 +20,7 @@ using namespace std;
 
 int main(){
 
-  int M = 1e4;
+  int M = 3e4;
   int N = 100;
   string filename = "ave_results_gas.dat";
 
@@ -57,18 +57,18 @@ void Input(void){ //Prepare all stuff for the simulation
   ReadInput >> restart;
 
   if(restart=="false"){
-  cout << "Classic Lennard-Jones fluid        " << endl;
-  cout << "Molecular dynamics simulation in NVE ensemble  " << endl << endl;
-  cout << "Interatomic potential v(r) = 4 * [(1/r)^12 - (1/r)^6]" << endl << endl;
-  cout << "The program uses Lennard-Jones units " << endl;
-  cout << "Number of particles = " << npart << endl;
-  cout << "Density of particles = " << rho << endl;
-  cout << "Volume of the simulation box = " << vol << endl;
-  cout << "Edge of the simulation box = " << box << endl;
-  cout << "The program integrates Newton equations with the Verlet method " << endl;
-  cout << "Time step = " << delta << endl;
-  cout << "Number of steps = " << nstep << endl << endl;
-}
+    cout << "Classic Lennard-Jones fluid        " << endl;
+    cout << "Molecular dynamics simulation in NVE ensemble  " << endl << endl;
+    cout << "Interatomic potential v(r) = 4 * [(1/r)^12 - (1/r)^6]" << endl << endl;
+    cout << "The program uses Lennard-Jones units " << endl;
+    cout << "Number of particles = " << npart << endl;
+    cout << "Density of particles = " << rho << endl;
+    cout << "Volume of the simulation box = " << vol << endl;
+    cout << "Edge of the simulation box = " << box << endl;
+    cout << "The program integrates Newton equations with the Verlet method " << endl;
+    cout << "Time step = " << delta << endl;
+    cout << "Number of steps = " << nstep << endl << endl;
+  }
   ReadInput.close();
 
 //Prepare array for measurements
@@ -158,10 +158,10 @@ void Equilibrate_system(){
   cout << "Thermalization phase of the simulation." << endl;
   cout << "Running 10000 steps that will be ignored at the end of this phase." << endl << endl;
   cout << "####################################################################" << endl;
-
-  for(int i=0; i<100000; i++){
+  int M = 50000;
+  for(int i=0; i<M; i++){
     if((i+1)%1000==0){
-      cout << "Thermalization process is running, step " << i+1 << "/20000. Rescaling velocities." << endl;
+      cout << "Thermalization process is running, step " << i+1 << "/" << M << ". Rescaling velocities." << endl;
       rescale_velocities();
     }
     if(i%10==0) Measure(true);
@@ -206,20 +206,21 @@ void blocking_on_MD(int M, int N, string filename){
 
   cout << "Starting simulation with blocking. " << endl;
   for(unsigned int i=0; i<N; i++){
-    if((i+1)%25) cout << "Running block " << i << " of " << N << endl;
+    if((i+1)%10==0) cout << "Running block " << i << " of " << N << endl;
     vector<double> meas(n_props,0);
     for(int k=0; k<L; k++){
       Move();
-      if(k%10==0) Measure(true);
-      else        Measure(false);
-      meas.at(iv)+=stima_pot;
-      meas.at(ik)+=stima_kin;
-      meas.at(ie)+=stima_etot;
-      meas.at(it)+=stima_temp;
+      if(k%10==0){
+        Measure(true);
+        meas.at(iv)+=stima_pot;
+        meas.at(ik)+=stima_kin;
+        meas.at(ie)+=stima_etot;
+        meas.at(it)+=stima_temp;
+      }
     }
     for(int j=0; j<n_props; j++){
-      sum.at(j) += meas.at(j)/L;
-      sum2.at(j)+= (meas.at(j)/L)*(meas.at(j)/L);
+      sum.at(j) += meas.at(j)/(L/10.);
+      sum2.at(j)+= (meas.at(j)/(L/10.))*(meas.at(j)/(L/10.));
       out << sum.at(j)/(i+1) << "   " << error(sum.at(j)/(i+1), sum2.at(j)/(i+1), i) << "   ";
     }
     out << endl;
@@ -389,7 +390,7 @@ void ConfFinal(void){ //Write final configuration
 
   cout << "Print final configuration to file config.final " << endl << endl;
   WriteConf.open("config.final");
-  WriteOld.open("old.final", ios::out | ios::trunc);
+  WriteOld.open("old.final");
 
   for (int i=0; i<npart; ++i){
     WriteConf << x[i]/box    << "   " <<  y[i]/box    << "   " << z[i]/box << endl;

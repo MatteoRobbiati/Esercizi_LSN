@@ -5,7 +5,7 @@
 
 #include <cmath>
 
-double _a0 = 0.0529e-9;
+//double _a0 = 0.0529e-9;
 
 class pdf{
   public:
