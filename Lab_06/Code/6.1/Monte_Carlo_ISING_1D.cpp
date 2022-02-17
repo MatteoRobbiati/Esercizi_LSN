@@ -66,7 +66,7 @@ void Input(string initial_condition, bool print){
    input.close();
 
 //Read input informations
-  ReadInput.open("input.dat");
+  ReadInput.open("input.file");
 
   ReadInput >> temp;
   ReadInput >> nspin;
