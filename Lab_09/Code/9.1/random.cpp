@@ -159,7 +159,9 @@ void Random :: generate_cities_on_circle(double r, int N, string filename){
 	return;
 }
 
-
+int Random :: select_from_pop(int Npop, double beta){
+	return Npop-int(Npop*pow(Rannyu(),beta))+1;
+}
 
 
 /****************************************************************
