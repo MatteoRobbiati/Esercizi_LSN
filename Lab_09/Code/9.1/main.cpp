@@ -21,13 +21,20 @@ int main(){
 
   Salesman *Jim_on_circle = new Salesman(N, M, circuit, rnd);
 
-  for(int i=0; i<500; i++) out << rnd.select_from_pop(M,0.1) << endl;
+  for(int i=0; i<500; i++) out << rnd.select_from_pop(M,0.2) << endl;
 
+/*
+  Jim_on_circle->show_chromo(34);
+  Jim_on_circle->show_chromo(502);
+  Jim_on_circle->crossover(34,502);
+  Jim_on_circle->show_chromo(34);
+  Jim_on_circle->show_chromo(502);
+*/
 
   Jim_on_circle->show_best_chromo();
 
   Jim_on_circle->save_chromo(0,"../../Results/circle_initial.dat");
-  Jim_on_circle->run(5e4);
+  Jim_on_circle->run(1e4);
   Jim_on_circle->save_chromo(0,"../../Results/circle_final.dat");
 
   Jim_on_circle->show_best_chromo();

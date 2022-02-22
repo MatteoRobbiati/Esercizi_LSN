@@ -163,6 +163,10 @@ int Random :: select_from_pop(int Npop, double beta){
 	return Npop-int(Npop*pow(Rannyu(),beta))+1;
 }
 
+int Random :: dice(){
+	return int(Rannyu()*6+1);
+}
+
 
 /****************************************************************
 *****************************************************************

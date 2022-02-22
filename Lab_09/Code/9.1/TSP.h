@@ -34,6 +34,10 @@ class Salesman{
     void genetic_step(void);
     void run(int);
     void show_best_chromo(void);
+
+    void shuffle_mutation(int);
+    void inverse_mutation(int);
+    void crossover(int, int);
 };
 
 #endif

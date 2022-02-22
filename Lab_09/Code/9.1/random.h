@@ -40,6 +40,7 @@ public:
   double generate_sin_angle();
   void generate_cities_on_circle(double r, int N, string filename);
   int select_from_pop(int Npop, double beta);
+  int dice(void);
 };
 
 #endif // __Random__

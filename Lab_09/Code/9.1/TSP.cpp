@@ -122,33 +122,106 @@ void Salesman::save_chromo(int index, string filename){
   return;
 }
 
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SELECTION OF A COUPLE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GENETIC STEP ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void Salesman::genetic_step(){
 
   for(int ipop=0; ipop<_Npop/2; ipop++){
+
     int x = _rnd.select_from_pop(_Npop, 0.1);
     int y = _rnd.select_from_pop(_Npop, 0.1);
 
-    double alpha = _rnd.Rannyu();
+    crossover(x,y);
 
-    if(alpha<0.3){
-      int index = int(_rnd.Rannyu()*(_N-4));     //generating an integer from 0 to 27
-      random_shuffle(_pop[x].tail.begin()+index, _pop[x].tail.begin()+index+4);
-      _pop[x].cost=Eval_fitness(_pop[x]);
+    //int coin = int(_rnd.Rannyu()*2);
+    int coin = 1;
+    
+    if(coin==0){
+      inverse_mutation(x);
+      inverse_mutation(y);
+    }
+    if(coin==1){
+      shuffle_mutation(x);
+      shuffle_mutation(y);
     }
 
-    alpha = _rnd.Rannyu();
-
-    if(alpha<0.3){
-      int index = int(_rnd.Rannyu()*(_N-4));     //generating an integer from 0 to 27
-      random_shuffle(_pop[y].tail.begin()+index, _pop[y].tail.begin()+index+4);
-      _pop[y].cost=Eval_fitness(_pop[y]);
-    }
   }
   return;
 }
 
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~ CROSSOVER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+void Salesman::crossover(int imum, int idad){
+  double alpha = _rnd.Rannyu();
+  if(alpha<0.7){
+    vector<int> cutted_from_mum;
+    vector<int> cutted_from_dad;
+    vector<int> order_in_mum;
+    vector<int> order_in_dad;
+    // how long the cut is and in which position of the two chromosomes
+    int ilen = _rnd.dice();                          // a number in [1,6];
+    int icut = int(_rnd.Rannyu()*(_N-ilen));         // a slot in [0,_N-ilen]
+
+
+    for(int i=0; i<ilen; i++){
+      cutted_from_mum.push_back(_pop[imum].tail.at(icut+i));
+      cutted_from_dad.push_back(_pop[idad].tail.at(icut+i));
+    }
+
+    int flag_mum = 0;
+    int flag_dad = 0;
+    while(flag_mum!=ilen && flag_dad!=ilen){
+      for(int k=0; k<_N-1; k++){
+        for(int j=0; j<ilen; j++){
+          if(_pop[imum].tail.at(k)==cutted_from_dad.at(j)){
+            order_in_mum.push_back(cutted_from_dad.at(j));
+            flag_dad++;
+          }
+          if(_pop[idad].tail.at(k)==cutted_from_mum.at(j)){
+            order_in_dad.push_back(cutted_from_mum.at(j));
+            flag_mum++;
+          }
+        }
+      }
+    }
+
+
+    for(int i=0; i<ilen; i++){
+      _pop[imum].tail.at(icut+i)=order_in_dad.at(i);
+      _pop[idad].tail.at(icut+i)=order_in_mum.at(i);
+    }
+    _pop[imum].cost = Eval_fitness(_pop[imum]);
+    _pop[idad].cost = Eval_fitness(_pop[idad]);
+  }
+  return;
+}
+
+
+// ~~~~~~~~~~~~~~~~~~~ SOME POSSIBLE MUTATIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+void Salesman::shuffle_mutation(int index){
+  double alpha = _rnd.Rannyu();
+  if(alpha < 0.1){
+    int icity = int(_rnd.Rannyu()*(_N-4));
+    random_shuffle(_pop[index].tail.begin()+icity, _pop[index].tail.begin()+icity+4);
+    _pop[index].cost = Eval_fitness(_pop[index]);
+  }
+  return;
+}
+
+void Salesman::inverse_mutation(int index){
+  double alpha = _rnd.Rannyu();
+  if(alpha < 0.1){
+    int i1 = int(_rnd.Rannyu()*(_N-1));
+    int i2 = int(_rnd.Rannyu()*(_N-1));
+    reverse(_pop[index].tail.begin()+min(i1,i2), _pop[index].tail.begin()+max(i1,i2));
+    _pop[index].cost = Eval_fitness(_pop[index]);
+  }
+  return;
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~ A RUN OF NPOP/2 GENETIC STEPS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void Salesman::run(int epochs){
   for(int i=0; i<epochs; i++){
@@ -159,6 +232,7 @@ void Salesman::run(int epochs){
   return;
 }
 
+// ~~~~~~~~~~~~~~~~~~~ SHOW BEST CHROMO IN THE POP ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void Salesman::show_best_chromo(){
   cout << "Best chromo has a fitness: " << _pop[0].cost << endl;
