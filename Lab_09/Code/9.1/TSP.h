@@ -20,24 +20,35 @@ class Salesman{
     int _Npop;
     vector<vector<double>> Prices;
     Chromo *_pop;
+    Chromo *_son;
     Random _rnd;
 
   public:
     Salesman(int, int, string, Random);
     ~Salesman();
+
     double Eval_fitness(Chromo);
+
     void show_prices(void);
     void show_chromo(int);
+    void show_chromo_son(Chromo);
+    void save_chromo(int, string, bool);
+    void show_best_chromo(void);
+    void print_best_fitness(string);
+
     void permute_chromo(int);
     void sort_pop(void);
-    void save_chromo(int, string);
+
     void genetic_step(void);
     void run(int);
-    void show_best_chromo(void);
+    int PBC(int);
 
     void shuffle_mutation(int);
     void inverse_mutation(int);
-    void crossover(int, int);
+    void swap_mutation(int);
+    void translation_mutation(int);
+
+    void crossover(Chromo, Chromo);
 };
 
 #endif

@@ -159,8 +159,21 @@ void Random :: generate_cities_on_circle(double r, int N, string filename){
 	return;
 }
 
+void Random :: generate_cities_in_square(double l, int N, string filename){
+	ofstream out;
+	out.open(filename);
+
+	for(int i=0; i<N; i++){
+		double x = Rannyu()*l;
+		double y = Rannyu()*l;
+		out << x << "   " << y << endl;
+	}
+	out.close();
+	return;
+}
+
 int Random :: select_from_pop(int Npop, double beta){
-	return Npop-int(Npop*pow(Rannyu(),beta))+1;
+	return Npop-int(Npop*pow(Rannyu(),beta))-1;
 }
 
 int Random :: dice(){
