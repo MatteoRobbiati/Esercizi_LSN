@@ -24,11 +24,11 @@ int main(){
   Salesman *Jim_in_square = new Salesman(N, M, square_circuit, rnd);
   Salesman *Jim_on_CIRCLE = new Salesman(100, M, big_circle_cir, rnd);
 
-  cout << "Jim is now working on the cities displaced on the circle! " << endl;
+/*  cout << "Jim is now working on the cities displaced on the circle! " << endl;
 
   Jim_on_circle->show_best_chromo();
   Jim_on_circle->save_chromo(0,"../../Results/circle_initial.dat", true);
-  Jim_on_circle->run(1000);
+  Jim_on_circle->run(300);
   Jim_on_circle->save_chromo(0,"../../Results/circle_final.dat", true);
   Jim_on_circle->show_best_chromo();
 
@@ -36,10 +36,10 @@ int main(){
 
   Jim_in_square->show_best_chromo();
   Jim_in_square->save_chromo(0,"../../Results/square_initial.dat", true);
-  Jim_in_square->run(1000);
+  Jim_in_square->run(300);
   Jim_in_square->save_chromo(0,"../../Results/square_final.dat", true);
   Jim_in_square->show_best_chromo();
-
+*/
   cout << endl << "Jim is now working on the cities displaced on the BIG circle! " << endl;
 
   Jim_on_CIRCLE->show_best_chromo();

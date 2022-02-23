@@ -115,6 +115,16 @@ void Salesman::print_best_fitness(string filename){
   return;
 }
 
+void Salesman::print_best_half(string filename){
+  ofstream out;
+  out.open(filename, ios::app);
+  double cost = 0.;
+  for(int i=0; i<_Npop/2; i++) cost += _pop[i].cost;
+  out << cost/(_Npop/2.) << endl;
+  out.close();
+  return;
+}
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SHOW A CHROMOSOME ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void Salesman::show_chromo(int index){
@@ -175,13 +185,6 @@ void Salesman::genetic_step(){
 
   _pop = _son;
 
-/*
-    if(doom==0){inverse_mutation(x); inverse_mutation(y);}
-    if(doom==1){shuffle_mutation(x); shuffle_mutation(y);}
-    if(doom==2){translation_mutation(x); translation_mutation(y);}
-    if(doom==3){swap_mutation(x); swap_mutation(y);}
-*/
-
 
   for(int i=0; i<_Npop; i++) _pop[i].cost = Eval_fitness(_pop[i]);
   sort_pop();
@@ -194,14 +197,13 @@ void Salesman::genetic_step(){
 
 void Salesman::crossover(Chromo mum, Chromo dad){
   double alpha = _rnd.Rannyu();
-  if(alpha<0.7){
+  if(alpha<0.8){
     vector<int> cutted_from_mum;
     vector<int> cutted_from_dad;
     vector<int> order_in_mum;
     vector<int> order_in_dad;
     // how long the cut is and in which position of the two chromosomes
-    //int ilen = _rnd.dice();                          // a number in [1,6];
-    int icut = int(_rnd.Rannyu()*(_N-1));         // a slot in [0,_N-ilen]
+    int icut = int(_rnd.Rannyu()*(_N-1));              // a slot in [0,_N-ilen]
     int ilen = _N-1-icut;
 
     for(int i=0; i<ilen; i++){
@@ -240,7 +242,7 @@ void Salesman::crossover(Chromo mum, Chromo dad){
 
 void Salesman::shuffle_mutation(int index){
   double alpha = _rnd.Rannyu();
-  if(alpha < 0.02){
+  if(alpha < 0.06){
     int icity = int(_rnd.Rannyu()*(_N-4));
     random_shuffle(_son[index].tail.begin()+icity, _son[index].tail.begin()+icity+4);
     //_pop[index].cost = Eval_fitness(_pop[index]);
@@ -250,7 +252,7 @@ void Salesman::shuffle_mutation(int index){
 
 void Salesman::inverse_mutation(int index){
   double alpha = _rnd.Rannyu();
-  if(alpha < 0.02){
+  if(alpha < 0.06){
     int i1 = int(_rnd.Rannyu()*(_N-1));
     int i2 = int(_rnd.Rannyu()*(_N-1));
     reverse(_son[index].tail.begin()+min(i1,i2), _son[index].tail.begin()+max(i1,i2));
@@ -265,7 +267,7 @@ void Salesman::translation_mutation(int index){
 
   for(int i=0; i<_N-1; i++) old_config.push_back(_son[index].tail.at(i));
 
-  if(alpha < 0.02){
+  if(alpha < 0.06){
     int ilen = _rnd.dice();
     for(int i=0; i<_N-1; i++) _son[index].tail[PBC(i+ilen)]=old_config.at(i);
     //_pop[index].cost = Eval_fitness(_pop[index]);
@@ -276,7 +278,7 @@ void Salesman::translation_mutation(int index){
 
 void Salesman::swap_mutation(int index){
   double alpha = _rnd.Rannyu();
-  if(alpha < 0.02){
+  if(alpha < 0.06){
     int i1 = int(_rnd.Rannyu()*(_N-1));
     int i2 = int(_rnd.Rannyu()*(_N-1));
     iter_swap(_son[index].tail.begin()+i1, _son[index].tail.begin()+i2);
@@ -290,7 +292,8 @@ void Salesman::run(int epochs){
   for(int i=0; i<epochs; i++){
     if(i%500==0) cout << "Running epoch " << i << "/" << epochs << ". Please wait :)" << endl;
     genetic_step();
-    print_best_fitness("../../Results/best.dat");
+    print_best_fitness("best.dat");
+    print_best_half("best_half.dat");
     save_chromo(0, "../../Results/gif.dat", false);
   }
   return;
@@ -302,6 +305,7 @@ void Salesman::show_best_chromo(){
   cout << "Best chromo has a fitness: " << _pop[0].cost << endl;
   return;
 }
+
 
 
 int Salesman::PBC(int index){

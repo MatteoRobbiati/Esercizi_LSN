@@ -11,4 +11,4 @@ TSP.o: TSP.cpp TSP.h random.h
 	$(CC) -c TSP.cpp -o TSP.o $(CFLAGS)
 
 clean:
-	rm *.o main.exe
+	rm *.o main.exe *.dat

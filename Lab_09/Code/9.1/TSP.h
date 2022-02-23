@@ -35,8 +35,10 @@ class Salesman{
     void save_chromo(int, string, bool);
     void show_best_chromo(void);
     void print_best_fitness(string);
+    void print_best_half(string);
 
     void permute_chromo(int);
+
     void sort_pop(void);
 
     void genetic_step(void);
