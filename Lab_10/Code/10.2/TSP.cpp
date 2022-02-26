@@ -8,7 +8,10 @@ using namespace std;
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ CONSTRUCTOR AND DISTRUCTOR ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Salesman::Salesman(int N, int pop_dim, string circuit, Random rnd){
+Salesman::Salesman(int N, int pop_dim, string circuit, Random rnd, int seed){
+
+  _rank = seed;
+  srand(seed);
 
   vector<vector<double>> cities(N);
   _rnd = rnd;
@@ -290,11 +293,11 @@ void Salesman::swap_mutation(int index){
 
 void Salesman::run(int epochs){
   for(int i=0; i<epochs; i++){
-    if(i%500==0) cout << "Running epoch " << i << "/" << epochs << ". Please wait :)" << endl;
+    //if(i%500==0) cout << "Running epoch " << i << "/" << epochs << ". Please wait :)" << endl;
     genetic_step();
-    print_best_fitness("best.dat");
-    print_best_half("best_half.dat");
-    save_chromo(0, "../../Results/gif.dat", false);
+    print_best_fitness("best"+to_string(_rank)+".dat");
+    print_best_half("best_half"+to_string(_rank)+".dat");
+    //save_chromo(0, "../../Results/gif.dat", false);
   }
   return;
 }
@@ -306,7 +309,24 @@ void Salesman::show_best_chromo(){
   return;
 }
 
+double Salesman::get_best_fit(){
+  return _pop[0].cost;
+}
 
+vector<int> Salesman::get_best_path(){
+  vector<int> path;
+  path.push_back(1);
+  for(int i=0; i<_N-1; i++) path.push_back(_pop[0].tail.at(i));
+  return path;
+}
+
+
+void Salesman::set_path(int index, vector<int> path){
+  _pop[index].head = path.at(0);
+  for(int i=0; i<_N-1; i++) _pop[index].tail[i] = path.at(i+1);
+  _pop[index].cost = Eval_fitness(_pop[index]);
+  return;
+}
 
 int Salesman::PBC(int index){
   return index%(_N-1);

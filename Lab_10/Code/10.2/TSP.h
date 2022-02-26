@@ -22,9 +22,10 @@ class Salesman{
     Chromo *_pop;
     Chromo *_son;
     Random _rnd;
+    int _rank;
 
   public:
-    Salesman(int, int, string, Random);
+    Salesman(int, int, string, Random, int);
     ~Salesman();
 
     double Eval_fitness(Chromo);
@@ -51,6 +52,10 @@ class Salesman{
     void translation_mutation(int);
 
     void crossover(Chromo, Chromo);
+
+    double get_best_fit();
+    vector<int> get_best_path();
+    void set_path(int, vector<int>);
 };
 
 #endif

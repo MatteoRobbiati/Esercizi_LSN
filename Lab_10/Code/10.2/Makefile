@@ -1,4 +1,4 @@
-CC = g++
+CC = mpicxx
 CFLAGS = -Wall -O3 --std=c++11
 
 main.exe : main.o TSP.o random.o
@@ -12,3 +12,6 @@ TSP.o: TSP.cpp TSP.h random.h
 
 clean:
 	rm *.o main.exe *.dat
+
+exe:
+	mpiexec -np 4 ./main.exe
