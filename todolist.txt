@@ -8,9 +8,9 @@ Lab_07 -> DA SVOLGERE
 Lab_08 -> 1. Aggiungere ricerca dei parametri migliori anche su griglia, al termine della discesa nello spazio
           2. DA SVOLGERE PUNTO 3
 Lab_09 -> controllare
-Lab_10 -> DA SVOLGERE
-Lab_11 -> DA SVOLGERE
-Lab_12 -> DA SVOLGERE
+Lab_10 -> controllare
+Lab_11 -> controllare
+Lab_12 -> fatti 12.1, 12.2, DA SVOLGERE 12.3
 
 
 All ----> 1. scrivere i notebook, controllare grafici e commenti;
