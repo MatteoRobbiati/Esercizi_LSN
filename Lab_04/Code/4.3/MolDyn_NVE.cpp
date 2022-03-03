@@ -22,7 +22,7 @@ int main(){
 
   int M = 3e4;
   int N = 100;
-  string filename = "ave_results_gas.dat";
+  string filename = "Risultati_belli/ave_results_liquid.dat";
 
   Input();
   if(restart=="true") Equilibrate_system();
@@ -158,9 +158,9 @@ void Equilibrate_system(){
   cout << "Thermalization phase of the simulation." << endl;
   cout << "Running 10000 steps that will be ignored at the end of this phase." << endl << endl;
   cout << "####################################################################" << endl;
-  int M = 1000;
+  int M = 2500;
   for(int i=0; i<M; i++){
-    if((i+1)%200==0){
+    if((i+1)%250==0){
       cout << "Thermalization process is running, step " << i+1 << "/" << M << ". Rescaling velocities." << endl;
       rescale_velocities();
     }
@@ -206,7 +206,7 @@ void blocking_on_MD(int M, int N, string filename){
 
   cout << "Starting simulation with blocking. " << endl;
   for(unsigned int i=0; i<N; i++){
-    if((i+1)%10==0) cout << "Running block " << i << " of " << N << endl;
+    if((i)%10==0) cout << "Running block " << i << " of " << N << endl;
     vector<double> meas(n_props,0);
     for(int k=0; k<L; k++){
       Move();
