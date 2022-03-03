@@ -158,9 +158,9 @@ void Equilibrate_system(){
   cout << "Thermalization phase of the simulation." << endl;
   cout << "Running 10000 steps that will be ignored at the end of this phase." << endl << endl;
   cout << "####################################################################" << endl;
-  int M = 50000;
+  int M = 1000;
   for(int i=0; i<M; i++){
-    if((i+1)%1000==0){
+    if((i+1)%200==0){
       cout << "Thermalization process is running, step " << i+1 << "/" << M << ". Rescaling velocities." << endl;
       rescale_velocities();
     }
