@@ -19,7 +19,7 @@ const double epsilon_on_K_B = 120;
 
 int n_props;
 int iv,ik,it,ie;
-double stima_pot, stima_kin, stima_etot, stima_temp;
+long double stima_pot, stima_kin, stima_etot, stima_temp;
 
 // averages
 double acc,att;
@@ -44,7 +44,7 @@ void blocking_on_MD(int, int, string);
 double error(double, double, unsigned int);
 
 //functions
-void Equilibrate_system();
+void Equilibrate_system(int);
 void set_restart(string, string);
 void rescale_velocities();
 void Input(void);

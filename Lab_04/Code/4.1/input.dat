@@ -1,10 +1,9 @@
-1.9
-108
 0.8
-2.5
+108
+1.1
+2.2
 0.0005
-10000
-1000
+5000
 false
 ReadInput
 >>
@@ -26,5 +25,5 @@ ReadInput
 nstep;
 ReadInput
 >>
-iprint;
+restart;
 
