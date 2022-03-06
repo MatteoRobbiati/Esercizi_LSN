@@ -11,6 +11,7 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 #include <iostream>
 #include <fstream>
 #include <ostream>
+#include <string>
 #include <cmath>
 #include <iomanip>
 #include "Monte_Carlo_NVT.h"
@@ -36,7 +37,8 @@ void Single_run(){
     Reset(iblk);                                    //Reset block averages
     for(int istep=1; istep <= nstep; ++istep){
       Move();
-      Measure();
+      if(istep%iprint==0) Measure(true);
+      else        Measure(false);
       Accumulate();                                 //Update block averages
     }
     Averages(iblk);                                 //Print results for current block
@@ -51,7 +53,12 @@ void Equilibrate_system(int equi_steps){
   if(restart=="true"){
     cout << "Equilibration phase is running, walker will be moved " << equi_steps << " times" << endl;
     cout << "And those values will be ignored." << endl;   // Moving for equi_steps-time the walker
-    for(int i=0; i<equi_steps; i++) Move();                // in the ending of EQUILIBRATION
+    for(int i=0; i<equi_steps; i++){
+      if(i%250==0) cout << "Equilibration step " << i << endl;
+      Move();
+      if(i%iprint==0) Measure(true);
+      else        Measure(false);
+    }
     set_restart("true","false");                           // change restart value true->false
   }else{
     cout << "No equilibration phase needed " << endl;
@@ -64,7 +71,7 @@ void Equilibrate_system(int equi_steps){
 void set_restart(string current, string new_val){
   string strReplace = current;
   string strNew = new_val;
-  ifstream filein("input.file");
+  ifstream filein("input.dat");
   ofstream fileout("input.temp");
 
   while(!filein.eof()){
@@ -73,7 +80,7 @@ void set_restart(string current, string new_val){
     if(temp==current) fileout << new_val << endl;
     else fileout << temp << endl;
   }
-  rename("input.temp", "input.file");
+  rename("input.temp", "input.dat");
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ INPUT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Ì
@@ -111,6 +118,8 @@ void Input(void){
   ReadInput >> delta;
   ReadInput >> nblk;
   ReadInput >> nstep;
+  ReadInput >> restart;
+  ReadInput >> iprint;
 
   beta = 1.0/temp;
   vol = (double)npart/rho;
@@ -122,7 +131,7 @@ void Input(void){
 
   if(restart=="false"){
     cout << endl << endl;
-    cout << "If you are at this point it means the equilibration phase is ended"
+    cout << "If you are at this point it means the equilibration phase is ended" << endl;
     cout << "-------------------------------------------------------------------" << endl;
     cout << "Temperature = " << temp << endl;
     cout << "Number of particles = " << npart << endl;
@@ -158,7 +167,7 @@ void Input(void){
 // from config.0 if the equilibration phase is starting
 // from config.final if the simulation is in the middle of the run
 
-  if(restart="true"){
+  if(restart=="true"){
     cout << "Read initial configuration from file config.0 " << endl << endl;
     ReadConf.open("config.0");
     for (int i=0; i<npart; ++i){
@@ -181,7 +190,7 @@ void Input(void){
   }
 
 //Evaluate potential energy and virial of the initial configuration
-  Measure();
+  Measure(false);
 
 //Print initial values for the potential energy and virial
   cout << "Initial potential energy (with tail corrections) = " << walker[iv]/(double)npart + vtail << endl;
@@ -266,7 +275,7 @@ double Boltzmann(double xx, double yy, double zz, int ip)
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ MEASURE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void Measure(){
+void Measure(bool print){
   int bin;
   double v = 0.0, w = 0.0;
   double vij, wij;
@@ -305,6 +314,14 @@ void Measure(){
 
   walker[iv] = 4.0 * v;
   walker[iw] = 48.0 * w / 3.0;
+
+  if(print==true){
+    ofstream out;
+    out.open("istant_output.dat", ios::app);
+    out << walker[iv]/(double)npart + vtail << "   " << walker[iw]/(double)npart + ptail
+        << "  " <<  rho*temp + (walker[iw]+(double)npart*ptail)/vol << endl;
+    out.close();
+  }
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RESET ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

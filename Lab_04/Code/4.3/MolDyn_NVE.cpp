@@ -55,6 +55,7 @@ void Input(void){ //Prepare all stuff for the simulation
   ReadInput >> nstep;
   ReadInput >> iprint;
   ReadInput >> restart;
+  ReadInput >> iprint;
 
   if(restart=="false"){
     cout << "Classic Lennard-Jones fluid        " << endl;

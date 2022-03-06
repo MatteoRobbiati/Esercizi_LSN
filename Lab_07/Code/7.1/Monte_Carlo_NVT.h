@@ -13,6 +13,10 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 
 //Random numbers
 #include "random.h"
+#include <string>
+
+using namespace std;
+
 int seed[4];
 Random rnd;
 
@@ -32,12 +36,13 @@ const int m_part=108;
 double x[m_part],y[m_part],z[m_part];
 
 // thermodynamical state
-int npart;
+int npart, iprint;
 double beta,temp,vol,rho,box,rcut;
 
 // simulation
 int nstep, nblk;
 double delta;
+string restart;
 
 //pigreco
 const double pi=3.1415927;
@@ -53,7 +58,7 @@ void Averages(int);
 void Move(void);
 void ConfFinal(void);
 void ConfXYZ(int);
-void Measure(void);
+void Measure(bool);
 double Boltzmann(double, double, double, int);
 double Pbc(double);
 double Error(double,double,int);
