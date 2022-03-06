@@ -1,10 +1,9 @@
-1.4
+0.8
 108
 1.1
 2.2
 0.0005
-10000
-1000
+5000
 true
 
   ReadInput >> temp;
@@ -13,4 +12,4 @@ true
   ReadInput >> rcut;
   ReadInput >> delta;
   ReadInput >> nstep;
-  ReadInput >> iprint;
+  ReadInput >> restart;

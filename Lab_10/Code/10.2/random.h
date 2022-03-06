@@ -7,53 +7,45 @@
 _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 *****************************************************************
 *****************************************************************/
-//parameters, observables
+
+#ifndef __Random__
+#define __Random__
+
+#include <vector>
 #include <string>
+
 using namespace std;
 
-const int m_props=4;
-const double K_B = 1.380649e-23;
-const double sigma = 0.34e-9;
-const double mass = 39.948*1.66054e-27;
-const double epsilon_on_K_B = 120;
+class Random {
 
-int n_props;
-int iv,ik,it,ie;
-long double stima_pot, stima_kin, stima_etot, stima_temp;
+private:
+  int m1,m2,m3,m4,l1,l2,l3,l4,n1,n2,n3,n4;
 
-// averages
-double acc,att;
+protected:
 
-//configuration
-const int m_part=108;
-double x[m_part],y[m_part],z[m_part],xold[m_part],yold[m_part],zold[m_part];
-double vx[m_part],vy[m_part],vz[m_part];
+public:
+  // constructors
+  Random();
+  // destructor
+  ~Random();
+  // methods
+  void SetRandom(int * , int, int);
+  void Init();
+  void SaveSeed();
+  double Rannyu(void);
+  double Rannyu(double min, double max);
+  double Gauss(double mean, double sigma);
+  double Line();
+  double generate_by_inversion(string distribution, vector<double> par);
+  double generate_sin_angle();
+  void generate_cities_on_circle(double r, int N, string filename);
+  void generate_cities_in_square(double l, int N, string filename);
+  int select_from_pop(int Npop, double beta);
+  int dice(void);
+};
 
-// thermodynamical state
-int npart;
-double energy,temp,vol,rho,box,rcut;
-string restart;    // useful for restarting with r(t-dt) and r(t)
+#endif // __Random__
 
-// simulation
-int nstep, iprint, seed;
-double delta;
-
-//blocking
-
-void blocking_on_MD(int, int, string);
-double error(double, double, unsigned int);
-
-//functions
-void Equilibrate_system(int);
-void set_restart(string, string);
-void rescale_velocities();
-void Input(void);
-void Move(void);
-void ConfFinal(void);
-void ConfXYZ(int);
-void Measure(bool);
-double Force(int, int);
-double Pbc(double);
 /****************************************************************
 *****************************************************************
     _/    _/  _/_/_/  _/       Numerical Simulation Laboratory

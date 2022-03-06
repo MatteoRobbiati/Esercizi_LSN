@@ -20,13 +20,13 @@ using namespace std;
 
 int main(){
 
-  int M = 3e4;
+  int M = 1e4;
   int N = 100;
-  string filename = "Risultati_belli/ave_results_liquid.dat";
+  string filename = "Risultati_belli/ave_gas.dat";
 
   Input();
-  if(restart=="true") Equilibrate_system();
-  blocking_on_MD(M, N, filename);
+  if(restart=="true") Equilibrate_system(1000);
+  //blocking_on_MD(M, N, filename);
   ConfFinal();
 
   return 0;
@@ -153,19 +153,18 @@ void Input(void){ //Prepare all stuff for the simulation
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ THERMALIZATION PHASE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void Equilibrate_system(){
+void Equilibrate_system(int N){
 
   cout << "####################################################################" << endl;
   cout << "Thermalization phase of the simulation." << endl;
-  cout << "Running 10000 steps that will be ignored at the end of this phase." << endl << endl;
+  cout << "Running "<< N << " steps that will be ignored at the end of this phase." << endl << endl;
   cout << "####################################################################" << endl;
-  int M = 2500;
-  for(int i=0; i<M; i++){
-    if((i+1)%250==0){
-      cout << "Thermalization process is running, step " << i+1 << "/" << M << ". Rescaling velocities." << endl;
+  for(int i=0; i<N; i++){
+    if((i+1)%(N/10)==0){
+      cout << "Thermalization process is running, step " << i+1 << "/" << N << ". Rescaling velocities." << endl;
       rescale_velocities();
     }
-    if(i%10==0) Measure(true);
+    if(i%100==0) Measure(true);
     Move();
   }
   set_restart("true","false");
@@ -282,7 +281,7 @@ void rescale_velocities(){
   }
   sumv2 /= (double)npart;
 
-  fs = sqrt(3 * temp / sumv2);   // fs = velocity scale factor
+  fs = sqrt(3 * 1.2 / sumv2);   // fs = velocity scale factor
   cout << "Scale factor is " << fs << endl;
   for (int i=0; i<npart; ++i){
     vx[i] *= fs;
@@ -324,7 +323,7 @@ double Force(int ip, int idir){ //Compute forces as -Grad_ip V(r)
 
 void Measure(bool print_istant){ //Properties measurement
   int bin;
-  double v, t, vij;
+  long double v, t, vij;
   double dx, dy, dz, dr;
   ofstream Epot, Ekin, Etot, Temp;
 
@@ -366,7 +365,7 @@ void Measure(bool print_istant){ //Properties measurement
   stima_pot  = (v/(double)npart); //Potential energy per particle
   stima_kin  = (t/(double)npart); //Kinetic energy per particle
   stima_temp = ((2.0 / 3.0) * t/(double)npart); //Temperature
-  stima_etot = ((t+v)/(double)npart); //Total energy per particle
+  stima_etot = ((t+v)/(long double)npart); //Total energy per particle
 
   if(print_istant==true){
     Epot << stima_pot  << endl;

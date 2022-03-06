@@ -14,7 +14,7 @@ int main(int argc, char *argv[]){
   // ~~~~~~~~~~~~~~~ Preparing the cities into the square ~~~~
 
   int N = 32;
-  int M = 1000;        // 250 chromos for each walker (4x250=1000 as in Lab_09)
+  int M = 1000;        // 1000 chromos for each walker
   int Nstep = 1000;
   int Nswap = 10;
 

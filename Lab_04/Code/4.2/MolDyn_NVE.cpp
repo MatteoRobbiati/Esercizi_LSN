@@ -24,7 +24,7 @@ int main(){
   int N = 100;
   string filename = "ave_results.dat";
 
-  Equilibrate_system();
+  Equilibrate_system(5000);
   Input();
   blocking_on_MD(M, N, filename);
   ConfFinal();
@@ -53,7 +53,6 @@ void Input(void){ //Prepare all stuff for the simulation
   ReadInput >> rcut;
   ReadInput >> delta;
   ReadInput >> nstep;
-  ReadInput >> iprint;
   ReadInput >> restart;
 
   if(restart=="false"){
@@ -152,16 +151,16 @@ void Input(void){ //Prepare all stuff for the simulation
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ THERMALIZATION PHASE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void Equilibrate_system(){
+void Equilibrate_system(int N){
 
   cout << "####################################################################" << endl;
   cout << "Thermalization phase of the simulation." << endl;
-  cout << "Running 10000 steps that will be ignored at the end of this phase." << endl << endl;
+  cout << "Running" << N << " steps that will be ignored at the end of this phase." << endl << endl;
   cout << "####################################################################" << endl;
 
   Input();
-  for(int i=0; i<5000; i++){
-    if((i+1)%1000==0){
+  for(int i=0; i<N; i++){
+    if((i+1)%(N/10)==0){
       cout << "Thermalization process is running, step " << i+1 << "/10000. Rescaling velocities." << endl;
       rescale_velocities();
     }
