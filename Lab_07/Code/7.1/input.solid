@@ -2,11 +2,11 @@
 108
 1.1
 2.2
-0.12
+0.11
 10
-1000
+50000
 true
-10
+1
 
   ReadInput >> temp;
   ReadInput >> npart;
