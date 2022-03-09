@@ -95,15 +95,15 @@ vector<double> RandomWalk::get_measure(){
   if(_metric=="discrete"){
     for(int step=0; step<_N; step++){
       make_discrete_step();
-      step_distance.at(step)+=get_squared_mod();
+      step_distance.at(step) = get_squared_mod();
     }
   }if(_metric=="continuum"){
     for(int step=0; step<_N; step++){
       make_continuum_step();
-      step_distance.at(step)+=get_squared_mod();
+      step_distance.at(step) = get_squared_mod();
     }
   }
-  for(int k=0; k<_N; k++) step_distance.at(k)=step_distance.at(k);
+
   return step_distance;
 }
 
