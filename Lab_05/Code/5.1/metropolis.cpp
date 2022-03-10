@@ -26,6 +26,11 @@ Metropolis::~Metropolis(){
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+void Metropolis::Equilibrate(int Nequi){
+  for(int i=0; i<Nequi; i++) try_step();
+  return;
+}
+
 void Metropolis::try_step(){
 
   vector<double> old = _x->get_coordinates();

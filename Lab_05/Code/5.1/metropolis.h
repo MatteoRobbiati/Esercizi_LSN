@@ -23,6 +23,8 @@ class Metropolis : public Measure{
   public:
     Metropolis(int N, pdf *mypdf, Position *start, Random* rnd, double stepsize, string method);
     ~Metropolis();
+
+    void Equilibrate(int Nequi);
     void try_step();
     void run(string filename);
     double rate_of_acceptance();
