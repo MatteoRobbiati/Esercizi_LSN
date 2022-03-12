@@ -24,7 +24,7 @@ using namespace std;
 int main(){
 
   Input("T=inf", false);
-  Equilibrate_system(10000);
+  Equilibrate_system(1000);
 
   for(int iT = 0; iT<=((2.-0.5)/stepT)*varyTemp; iT++){    // only 1 loop if varyTemp is 0
     if(iT==0) cout << "Starting simulation at T=" << temp << endl << "----------------------------------" << endl;
@@ -244,7 +244,7 @@ double Boltzmann(int sm, int ip){
 
 void Measure(){
 //  int bin;
-  double u = 0.0, m = 0.0;
+  long double u = 0.0, m = 0.0;
 //cycle over spins
   for (int i=0; i<nspin; ++i){
      u += -J * s[i] * s[Pbc(i+1)] - 0.5 * h * (s[i] + s[Pbc(i+1)]);
@@ -254,6 +254,12 @@ void Measure(){
   walker[ic] = u * u;
   walker[im] = m;
   walker[ix] = beta * m * m;
+
+  if(varyTemp==0){
+    ofstream out;
+    out.open("istant_u.dat", ios::app);
+    out << u/(double)nspin << endl;
+  }
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ SOME USEFUL METHODS FOR BLOCKING ~~~~~~~~~~~~~~~~~~~~~~~
