@@ -23,8 +23,8 @@ using namespace std;
 
 int main(){
 
-  double mu0[] = {0.5, 0.5, 1.5, 1.5};
-  double si0[] = {0.5, 1.5, 0.5, 1.5};
+  double mu0[] = {0.5, 0.5, 1, 1};
+  double si0[] = {0.5, 0.8, 0.5, 0.8};
   string nam[] = {"1", "2", "3", "4"};
 
   Read_input();
@@ -35,9 +35,9 @@ int main(){
     cout << "----- starting point number " << i+1 << endl;
     mu    = mu0[i];
     sigma = si0[i];
-    for(int ipar=0; ipar<1000; ipar++){
+    for(int ipar=0; ipar<300; ipar++){
       if(ipar%10==0){
-        cout << "This is the " << ipar << "/1000 step of the exploration, here we have: ";
+        cout << "This is the " << ipar << "/500 step of the exploration, here we have: ";
         cout << "(mu, sigma) = (" << mu << ", " << sigma << ")" << endl;
       }
       Explore();

@@ -5,17 +5,37 @@
 0.3
 false
 1
-0.015
+0.01
 20
 1000
+in
+>>
+x;
+in
+>>
+stepsize;
+in
+>>
+print_hist;
+in
+>>
+mu;
+in
+>>
+sigma;
+in
+>>
+restart;
+in
+>>
+explore;
+in
+>>
+delta;
+in
+>>
+nblk;
+in
+>>
+nstep;
 
-  in >> x;
-  in >> stepsize;
-  in >> print_hist;
-  in >> mu;
-  in >> sigma;
-  in >> restart;
-  in >> explore;
-  in >> delta;
-  in >> nblk;
-  in >> nstep;
