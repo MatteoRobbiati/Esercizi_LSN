@@ -1,5 +1,6 @@
 #include "statistic.h"
 #include "measure.h"
+#include <string>
 #include "random.h"
 
 using namespace std;
@@ -15,7 +16,7 @@ Statistic::~Statistic(){};
 //~~~~~~~~~~~~~~~~ metodi ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-void Statistic::blocking(int M, int N, Measure *measure, const char* filename){
+void Statistic::blocking(int M, int N, Measure *measure, string filename){
   ofstream out;
   int L = M/N;
   out.open(filename, ios::out | ios::trunc);

@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <fstream>
 #include "random.h"
+#include <string>
 #include "measure.h"
 #include <cmath>
 
@@ -20,7 +21,7 @@ class Statistic: public Random{
     Statistic();
     ~Statistic();
     
-    void blocking(int M, int N, Measure* measure, const char* filename);
+    void blocking(int M, int N, Measure* measure, string filename);
     double error(double val, double val2, unsigned int k);
     double chiquad(vector<double> vec,double, bool approx);
     double mean(vector<double> vec);

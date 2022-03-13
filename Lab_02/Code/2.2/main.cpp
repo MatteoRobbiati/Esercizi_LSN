@@ -1,4 +1,4 @@
-y#include <iostream>
+#include <iostream>
 #include "randomwalk.h"
 #include "statistic.h"
 #include "random.h"
@@ -20,8 +20,8 @@ int main(int argc, char* argv[]){
   int dimension = 3;
 
 
-  RandomWalk disc_RW(d, N, dimension, "discrete", rnd);
-  RandomWalk cont_RW(d, N, dimension, "continuum", rnd);
+  RandomWalk disc_RW(d, 100, dimension, "discrete", rnd);
+  RandomWalk cont_RW(d, 100, dimension, "continuum", rnd);
 
   disc_RW.run_walk("../../Results/discrete_RW.dat");
   cont_RW.run_walk("../../Results/continuum_RW.dat");
