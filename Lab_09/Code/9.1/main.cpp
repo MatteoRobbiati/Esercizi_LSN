@@ -24,7 +24,11 @@ int main(){
   Salesman *Jim_in_square = new Salesman(N, M, square_circuit, rnd);
   Salesman *Jim_on_CIRCLE = new Salesman(100, M, big_circle_cir, rnd);
 
-/*  cout << "Jim is now working on the cities displaced on the circle! " << endl;
+  cout << "Jim is now working on the cities displaced on the circle! " << endl;
+
+  ofstream out;
+  out.open("../../Results/hist.dat");
+  for(int i=0; i<1e5; i++) out << rnd.select_from_pop(1000,0.05) << endl;
 
   Jim_on_circle->show_best_chromo();
   Jim_on_circle->save_chromo(0,"../../Results/circle_initial.dat", true);
@@ -39,12 +43,12 @@ int main(){
   Jim_in_square->run(300);
   Jim_in_square->save_chromo(0,"../../Results/square_final.dat", true);
   Jim_in_square->show_best_chromo();
-*/
+
   cout << endl << "Jim is now working on the cities displaced on the BIG circle! " << endl;
 
   Jim_on_CIRCLE->show_best_chromo();
   Jim_on_CIRCLE->save_chromo(0,"../../Results/CIRCLE_initial.dat", true);
-  Jim_on_CIRCLE->run(10000);
+  Jim_on_CIRCLE->run(8000);
   Jim_on_CIRCLE->save_chromo(0,"../../Results/CIRCLE_final.dat", true);
   Jim_on_CIRCLE->show_best_chromo();
 
