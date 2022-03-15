@@ -9,6 +9,8 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 *****************************************************************/
 //parameters, observables
 #include <string>
+#include <vector>
+
 using namespace std;
 
 const int m_props=4;
@@ -45,8 +47,9 @@ double error(double, double, unsigned int);
 
 //functions
 void Equilibrate_system(int);
+double eval_mean_v2();
 void set_restart(string, string);
-void rescale_velocities();
+void rescale_velocities(vector<double>);
 void Input(void);
 void Move(void);
 void ConfFinal(void);

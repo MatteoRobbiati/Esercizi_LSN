@@ -12,6 +12,9 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 #include <fstream>      // Stream class to both read and write from/to files.
 #include <string>
 #include <vector>
+#include <numeric>
+#include <algorithm>
+#include <iomanip>
 #include <stdio.h>
 #include <cmath>        // rint, pow
 #include "MolDyn_NVE.h"
@@ -20,13 +23,13 @@ using namespace std;
 
 int main(){
 
-  int M = 1e4;
+  int M = 3e5;
   int N = 100;
   string filename = "Risultati_belli/ave_gas.dat";
 
   Input();
-  if(restart=="true") Equilibrate_system(1000);
-  //blocking_on_MD(M, N, filename);
+  if(restart=="true") Equilibrate_system(50000);
+  blocking_on_MD(M, N, filename);
   ConfFinal();
 
   return 0;
@@ -159,12 +162,22 @@ void Equilibrate_system(int N){
   cout << "Thermalization phase of the simulation." << endl;
   cout << "Running "<< N << " steps that will be ignored at the end of this phase." << endl << endl;
   cout << "####################################################################" << endl;
+
   for(int i=0; i<N; i++){
-    if((i+1)%(N/10)==0){
+
+    vector<double> mean_v2_history;
+    mean_v2_history.push_back(eval_mean_v2());
+
+    //if(i==N/10){temp = 1.1; cout << "Changing temperature T*: 1.0 --> 1.1" << endl;}
+    if(i==10000) {temp = 1.2; cout << "Changing temperature T*: 1.0 --> 1.2" << endl;}
+
+    if((i+1)%(N/5)==0){
       cout << "Thermalization process is running, step " << i+1 << "/" << N << ". Rescaling velocities." << endl;
-      rescale_velocities();
+      rescale_velocities(mean_v2_history);
+      mean_v2_history.clear();
     }
     if(i%100==0) Measure(true);
+
     Move();
   }
   set_restart("true","false");
@@ -210,7 +223,7 @@ void blocking_on_MD(int M, int N, string filename){
     vector<double> meas(n_props,0);
     for(int k=0; k<L; k++){
       Move();
-      if(k%10==0){
+      if(k%100==0){
         Measure(true);
         meas.at(iv)+=stima_pot;
         meas.at(ik)+=stima_kin;
@@ -221,7 +234,7 @@ void blocking_on_MD(int M, int N, string filename){
     for(int j=0; j<n_props; j++){
       sum.at(j) += meas.at(j)/(L/10.);
       sum2.at(j)+= (meas.at(j)/(L/10.))*(meas.at(j)/(L/10.));
-      out << sum.at(j)/(i+1) << "   " << error(sum.at(j)/(i+1), sum2.at(j)/(i+1), i) << "   ";
+      out << setprecision(8)  << sum.at(j)/(i+1) << "   " << setprecision(8) << error(sum.at(j)/(i+1), sum2.at(j)/(i+1), i) << "   ";
     }
     out << endl;
   }
@@ -268,20 +281,36 @@ void Move(void){ //Move particles with Verlet algorithm
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RESCALING VELOCITIES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ at first, accumulate a certain number of mean_v2 ~~~~~~~~~~~~~~~
 
-void rescale_velocities(){
+double eval_mean_v2(){
+  double mean_v2 = 0;
 
-  double sumv2 = 0.0;
-  double fs=0.0;
   for(int i=0; i<npart; i++){
     vx[i] = Pbc(x[i] - xold[i])/(delta);
     vy[i] = Pbc(y[i] - yold[i])/(delta);
     vz[i] = Pbc(z[i] - zold[i])/(delta);
-    sumv2+=vx[i]*vx[i] + vy[i]*vy[i] + vz[i]*vz[i];
+    mean_v2+=vx[i]*vx[i] + vy[i]*vy[i] + vz[i]*vz[i];
   }
-  sumv2 /= (double)npart;
 
-  fs = sqrt(3 * 1.2 / sumv2);   // fs = velocity scale factor
+  mean_v2 /= (double)npart;
+  return mean_v2;
+}
+
+// ~~~~~~~~~~~~~ then use them for calculating a more stable value of sumv2 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+void rescale_velocities(vector<double> history_kin){
+
+  double fs       = 0.0;
+  double sumv2    = 0.0;
+
+  for(unsigned int i=0; i<history_kin.size(); i++) sumv2 += history_kin.at(i);
+
+  sumv2 /= history_kin.size();
+  cout << "Media delle velocità medie calcolate: " << sumv2 << endl;
+
+  fs = sqrt(3 * temp / sumv2);   // fs = velocity scale factor
+
   cout << "Scale factor is " << fs << endl;
   for (int i=0; i<npart; ++i){
     vx[i] *= fs;
