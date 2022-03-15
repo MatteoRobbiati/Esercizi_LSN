@@ -53,7 +53,7 @@ void Accumulate(void);
 void Averages(int);
 void Move();
 void Explore();
-void Measure(void);
+void Measure(bool);
 void Single_run(double mu, double sigma);
 double Error(double,double,int);
 void set_restart(string, string);
@@ -66,6 +66,7 @@ double eval_V();
 double apply_H(double mu, double sigma);
 double p(double x);
 void show_exploration(string);
+void simulated_annealing(double betai, double betaf, int Nstep);
 
 #endif
 

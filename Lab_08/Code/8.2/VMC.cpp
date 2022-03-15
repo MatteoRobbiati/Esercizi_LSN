@@ -15,6 +15,8 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 #include <ostream>
 #include <cmath>
 #include <iomanip>
+#include <vector>
+#include <algorithm>
 #include <stdio.h>
 #include "VMC.h"
 #include <string>
@@ -23,27 +25,11 @@ using namespace std;
 
 int main(){
 
-  double mu0[] = {0.5, 0.5, 1, 1};
-  double si0[] = {0.5, 0.8, 0.5, 0.8};
-  string nam[] = {"1", "2", "3", "4"};
 
   Read_input();
   Equilibrate_system(10000);
-
-  for(int i = 0; i<4; i++){
-    block_e=10;
-    cout << "----- starting point number " << i+1 << endl;
-    mu    = mu0[i];
-    sigma = si0[i];
-    for(int ipar=0; ipar<300; ipar++){
-      if(ipar%10==0){
-        cout << "This is the " << ipar << "/500 step of the exploration, here we have: ";
-        cout << "(mu, sigma) = (" << mu << ", " << sigma << ")" << endl;
-      }
-      Explore();
-      show_exploration("params"+nam[i]+".dat");
-    }
-  }
+  Single_run(mu, sigma);
+  simulated_annealing(1., 300, 300);
 
   return 0;
 }
@@ -57,7 +43,7 @@ void Single_run(double mu, double sigma){
     Reset(iblk);                                    //Reset block averages
     for(int istep=1; istep <= nstep; ++istep){
       Move();
-      Measure();
+      Measure(false);
       Accumulate();                                 //Update block averages
     }
     Averages(iblk);                                 //Print results for current block
@@ -178,20 +164,25 @@ void Explore(){
   sigma += rnd.Rannyu(-delta,delta);
   Single_run(mu, sigma);
   if(block_e > old_ene){
-    mu    = old_mu;
-    sigma = old_sigma;
+    mu      = old_mu;
+    sigma   = old_sigma;
+    block_e = old_ene;
   }
   return;
 }
 
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ MEASURE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void Measure(){
-  ofstream out;
-  out.open("energia_one_shot.dat", ios::app);
+void Measure(bool print){
   walker[ie] = apply_H(mu, sigma) + eval_V();
-  out << walker[ie] << endl;
-  out.close();
+
+  if(print==true){
+    ofstream out;
+    out.open("energia_one_shot.dat", ios::app);
+    out << walker[ie] << endl;
+    out.close();
+  }
   return;
 }
 
@@ -263,6 +254,62 @@ double Error(double sum, double sum2, int iblk){
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Print x value on a file ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+void simulated_annealing(double betai, double betaf, int Nstep){
+
+  cout << "*******************************************************" << endl;
+  cout << "*** The simulated annealing process is starting now ***" << endl;
+  cout << "*******************************************************" << endl << endl;
+  cout << " beta ini   = " << betai << endl;
+  cout << " beta fin   = " << betaf << endl;
+  cout << " beta step  = " << 1 << endl;
+  cout << " Initial Energy = " << block_e << endl << endl;
+
+  ofstream out, par_out;
+  out.open("../../Results/show_annealing.dat");
+  par_out.open("../../Results/par_history.dat");
+  double Eold, Enew, p;
+  double beta = betai;
+  vector<double> acceptance_rate;
+
+  for(int i=0; i<Nstep; i++){
+
+    beta += i;
+    if(i%10 == 0) cout << "Step " << i+1 << " is running at T = " << 1/beta << endl;
+
+
+    double old_mu    = mu;
+    double old_sigma = sigma;
+
+    Eold  = block_e;
+
+    mu   += rnd.Rannyu(-delta,delta);
+    sigma += rnd.Rannyu(-delta,delta);
+
+    Single_run(mu, sigma);
+    Enew = block_e;
+
+    p = min(1., exp((-beta)*(Enew-Eold)));
+
+    if(rnd.Rannyu() < p) { cout << "acc" << endl;}
+    else                 { mu=old_mu; sigma=old_sigma; block_e=Eold;}
+    out << block_e << endl;
+
+    if(i%100==0) par_out << mu << "  " << sigma << endl;
+  }
+
+  cout << endl << "Final energy = " <<  block_e << endl;
+  cout << "Final params : (mu, sigma) = (" << mu << ", " << sigma << " )" << endl;
+
+  cout << "********************************************************" << endl;
+  cout << "** This is the end of the simulated annealing process **" << endl;
+  cout << "********************************************************" << endl << endl;
+
+  out.close();
+  par_out.close();
+  return;
+}
 
 void print_x(string filename){
   ofstream out;
