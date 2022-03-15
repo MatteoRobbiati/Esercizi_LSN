@@ -28,6 +28,8 @@ in the file "input.dat".
 #include <TRandom3.h>
 #include "constants.h"
 #include "functions.h"
+#include <string>
+#include <stdio.h>
 
 #define LEFT 0
 #define RIGHT 1
@@ -38,45 +40,59 @@ using namespace std;
 
 int main(){
 
-  readInput();
-	initialize();
+  //int taus[]  = {1, 2, 5, 8};
 
-/* at this time, every variable you see, such for instance "equilibration",
-has been either acquired from "input.dat" by the readInput() function or
-opportunely initialized by the initialize() function. */
+  //for(int itau=0; itau<5; itau++){
+  //  cout << "Executing PIGS evaluation using tau = " << taus[itau] << endl;
 
-	for(int i=0;i<equilibration;i++){
-		if(PIGS){   // only a PIGS polymer has a start and an end.
-			brownianMotion(LEFT);
-			brownianMotion(RIGHT);
-		}
-		translation();
-		for(int j=0;j<brownianBridgeAttempts;j++) brownianBridge();
-	}
+    readInput();
+  // i want to explore different combinations for tau values
+  //  imaginaryTimePropagation = taus[itau];
+  	initialize();
 
-	for(int b=0;b<blocks;b++){
-		for(int i=0;i<MCSTEPS;i++){
-			if(PIGS){
-				brownianMotion(LEFT);
-				brownianMotion(RIGHT);
-			}
-			translation();
+  /* at this time, every variable you see, such for instance "equilibration",
+  has been either acquired from "input.dat" by the readInput() function or
+  opportunely initialized by the initialize() function. */
 
-			for(int j=0;j<brownianBridgeAttempts;j++)
-				brownianBridge();
+  	for(int i=0;i<equilibration;i++){
+  		if(PIGS){   // only a PIGS polymer has a start and an end.
+  			brownianMotion(LEFT);
+  			brownianMotion(RIGHT);
+  		}
+  		translation();
+  		for(int j=0;j<brownianBridgeAttempts;j++) brownianBridge();
+  	}
 
-			upgradeAverages();
-		}
-		cout<<"Completed block: "<<b+1<<"/"<<blocks<<endl;
-		endBlock();
-	}
+  	for(int b=0;b<blocks;b++){
+  		for(int i=0;i<MCSTEPS;i++){
+  			if(PIGS){
+  				brownianMotion(LEFT);
+  				brownianMotion(RIGHT);
+  			}
+  			translation();
 
-	consoleOutput();
-	finalizePotentialEstimator();
-	finalizeKineticEstimator();
-	finalizeHistogram();
+  			for(int j=0;j<brownianBridgeAttempts;j++)
+  				brownianBridge();
 
-	deleteMemory();  // de-allocate dynamic variables.
+  			upgradeAverages();
+  		}
+  		cout<<"Completed block: "<<b+1<<"/"<<blocks<<endl;
+  		endBlock();
+  	}
+
+  	consoleOutput();
+  	finalizePotentialEstimator();
+  	finalizeKineticEstimator();
+  	finalizeHistogram();
+
+
+    //string new_name = "wf_var_"+to_string(taus[itau])+".dat";
+
+    //rename("probability.dat", new_name.c_str());
+    cout << " ------------------------------------------------ " << endl;
+    cout << endl;
+  	deleteMemory();  // de-allocate dynamic variables.
+  //}
 	return 0;
 }
 
@@ -186,7 +202,7 @@ double external_potential(double val){
   if(potential_type==0){
     double k_elastic = 1;
 	  return k_elastic*val*val/2.0;
-  }else if(potential_type==1){
+  }else{
     return pow(val,4)-2.5*pow(val,2);
   }
 }
@@ -196,7 +212,7 @@ double external_potential_prime(double val){
   if(potential_type==0){
     double k_elastic = 1;
     return k_elastic*val;
-  }else if(potential_type==1){
+  }else{
     return 4*pow(val,3)-5*val;
   }
 }
@@ -205,7 +221,7 @@ double external_potential_second(double val){
   if(potential_type==0){
     double k_elastic = 1;
     return k_elastic;
-  }else if(potential_type==1){
+  }else{
     return 12*pow(val,3)-5;
   }
 }
@@ -223,13 +239,13 @@ double gauss(double v, double mu, double sigma){
 
 double variationalWaveFunction(double v){
   if(wf_type == 0)        return 1.0;
-	else if(wf_type == 1) 	return gauss(v, +mu, sigma) + gauss(v, -mu, sigma);
+	else                  	return gauss(v, +mu, sigma) + gauss(v, -mu, sigma);
 	//return v*v*exp(-0.5*v*v) - exp(-0.5*v*v);
 }
 
 double variationalWaveFunction_second(double v){
 	if(wf_type == 0)        return 0;
-	else if(wf_type == 1)		return - 1./pow(sigma, 2) * variationalWaveFunction(v)
+	else                 		return - 1./pow(sigma, 2) * variationalWaveFunction(v)
 				                  + 1./pow(sigma, 4) * (pow(v - mu, 2) * gauss(v, +mu, sigma)
 				                  +  pow(v + mu, 2) * gauss(v, -mu, sigma));
 	//return v*v*exp(-0.5*v*v) - exp(-0.5*v*v);

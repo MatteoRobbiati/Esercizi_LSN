@@ -1,10 +1,10 @@
 timeslices				30
-temperature				1.25
+temperature				0.1
 imaginaryTimePropagation		8.0
                                                                                                                  
 brownianMotionReconstructions           0
-delta_translation			1.8
-brownianBridgeReconstructions		20
+delta_translation			0.5
+brownianBridgeReconstructions		8
 brownianBridgeAttempts			4
                                                                                                                  
 MCSTEPS					4000
@@ -15,6 +15,12 @@ histogram_bins				400
 histogram_start				-10
 histogram_end				10
 timeslices_interval_for_averages	1 29
+
+potential_type                      1
+wf_type                             1
+
+mu                                  0.8
+sigma                               0.62
 
 # Choose histogram_start & histogram_end large enough in order to
 # contain each sampled position
