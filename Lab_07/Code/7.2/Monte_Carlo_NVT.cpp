@@ -38,7 +38,7 @@ void Single_run(){
     for(int istep=1; istep <= nstep; ++istep){
       Move();
       if(istep%iprint==0) Measure(true);
-      else        Measure(false);
+      else                Measure(false);
       Accumulate();                                 //Update block averages
     }
     Averages(iblk);                                 //Print results for current block
@@ -57,7 +57,7 @@ void Equilibrate_system(int equi_steps){
       if(i%250==0) cout << "Equilibration step " << i << endl;
       Move();
       if(i%iprint==0) Measure(true);
-      else        Measure(false);
+      else            Measure(false);
     }
     set_restart("true","false");                           // change restart value true->false
   }else{
@@ -202,8 +202,7 @@ void Input(void){
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ MOVE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-void Move(void)
-{
+void Move(void){
   int o;
   double p, energy_old, energy_new;
   double xold, yold, zold, xnew, ynew, znew;
@@ -230,13 +229,12 @@ void Move(void)
 
   //Metropolis test
     p = exp(beta*(energy_old-energy_new));
-    if(p >= rnd.Rannyu())
-    {
+
+    if(p >= rnd.Rannyu()){
     //Update
        x[o] = xnew;
        y[o] = ynew;
        z[o] = znew;
-
        accepted = accepted + 1.0;
     }
     attempted = attempted + 1.0;
@@ -300,6 +298,9 @@ void Measure(bool print){
 
 //update of the histogram of g(r)
 
+    bin = int(dr/bin_size);
+    if (bin < nbins) walker[igofr + bin] += 2;
+
      if(dr < rcut)
      {
        vij = 1.0/pow(dr,12) - 1.0/pow(dr,6);
@@ -315,6 +316,7 @@ void Measure(bool print){
   walker[iv] = 4.0 * v;
   walker[iw] = 48.0 * w / 3.0;
 
+  // print==true means that i want to see the istant values of potential and pressure
   if(print==true){
     ofstream out;
     out.open("istant_output.dat", ios::app);
@@ -377,40 +379,56 @@ void Averages(int iblk){
     err_press=Error(glob_av[iw],glob_av2[iw],iblk);
 
 //Potential energy per particle
-    Epot << setw(wd) << iblk <<  setw(wd) << stima_pot << setw(wd) << glob_av[iv]/(double)iblk << setw(wd) << err_pot << endl;
+    Epot << setw(wd) << iblk <<  setw(wd) << stima_pot << setw(wd)
+         << glob_av[iv]/(double)iblk << setw(wd) << err_pot << endl;
 //Pressure
-    Pres << setw(wd) << iblk <<  setw(wd) << stima_pres << setw(wd) << glob_av[iw]/(double)iblk << setw(wd) << err_press << endl;
+    Pres << setw(wd) << iblk <<  setw(wd) << stima_pres << setw(wd)
+         << glob_av[iw]/(double)iblk << setw(wd) << err_press << endl;
 
 //g(r)
 
-    cout << "----------------------------" << endl << endl;
+  for(int k=0; k<nbins; k++){
+    r = k * bin_size;
+	  blk_av[igofr + k] /= rho * npart * (4 * pi / 3 * (pow(r + bin_size, 3) - pow(r, 3)));
+    gdir = blk_av[igofr + k] / blk_norm;
+	  glob_av[igofr + k] += gdir;
+    glob_av2[igofr + k] += gdir*gdir;
+    err_gdir = Error(glob_av[igofr + k], glob_av2[igofr + k], iblk);
 
-    Epot.close();
-    Pres.close();
-    Gofr.close();
+	  Gofr << setw(wd) << iblk << setw(wd) << r << setw(wd)
+         << glob_av[igofr + k]/double(iblk) << setw(wd) << err_gdir << endl;
+
+	  if(iblk == nblk){
+		    Gave << r << setw(wd) << glob_av[igofr + k]/double(nblk) << setw(wd) << err_gdir << endl;
+	  }
+  }
+
+  cout << "----------------------------" << endl << endl;
+
+  Epot.close();
+  Pres.close();
+  Gofr.close();
+  Gave.close();
 }
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ WRITE CONFIGURATIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void ConfFinal(void)
-{
+void ConfFinal(void){
   ofstream WriteConf;
 
   cout << "Print final configuration to file config.final " << endl << endl;
   WriteConf.open("config.final");
-  for (int i=0; i<npart; ++i)
-  {
-    WriteConf << x[i]/box << "   " <<  y[i]/box << "   " << z[i]/box << endl;
-  }
-  WriteConf.close();
 
+  for (int i=0; i<npart; ++i)   WriteConf << x[i]/box << "   " <<  y[i]/box << "   " << z[i]/box << endl;
+
+  WriteConf.close();
   rnd.SaveSeed();
 }
 
+
 void ConfXYZ(int nconf){ //Write configuration in .xyz format
   ofstream WriteXYZ;
-
   WriteXYZ.open("frames/config_" + to_string(nconf) + ".xyz");
   WriteXYZ << npart << endl;
   WriteXYZ << "This is only a comment!" << endl;
@@ -419,6 +437,9 @@ void ConfXYZ(int nconf){ //Write configuration in .xyz format
   }
   WriteXYZ.close();
 }
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PBC and Errore (useful in blocking) ~~~~~~~~~~~~~~~~
 
 double Pbc(double r)  //Algorithm for periodic boundary conditions with side L=box
 {
