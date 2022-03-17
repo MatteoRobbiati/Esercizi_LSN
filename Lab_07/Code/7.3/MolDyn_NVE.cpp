@@ -24,11 +24,11 @@ using namespace std;
 int main(){
 
   int M = 2e5;
-  int N = 10;
-  string filename = "../../Results/gofr_NVE_gas.dat";
+  int N = 100;
+  string filename = "../../Results/gofr_NVE_gas_50000.dat";
 
   Input();
-  if(restart=="true") Equilibrate_system(20000);
+  if(restart=="true") Equilibrate_system(50000);
   blocking_on_MD(M, N, filename);
   ConfFinal();
 
@@ -172,22 +172,28 @@ void Equilibrate_system(int N){
   cout << "Running "<< N << " steps that will be ignored at the end of this phase." << endl << endl;
   cout << "####################################################################" << endl;
 
+  int hist_dimension = 100;
+  int hist_count     = 0;
+  vector<double> mean_v2_history;
+
   for(int i=0; i<N; i++){
 
-    vector<double> mean_v2_history;
-    mean_v2_history.push_back(eval_mean_v2());
+    Move();
+    if(hist_count > 4900) mean_v2_history.push_back(eval_mean_v2());
 
-    //if(i==N/10){temp = 1.1; cout << "Changing temperature T*: 1.0 --> 1.1" << endl;}
-    if(i==10000) {temp = 1.2; cout << "Changing temperature T*: 1.0 --> 1.2" << endl;}
+    if(i==int(N/10)){temp = 1.0; cout << "Changing temperature T*: 0.8 --> 1.0" << endl;}
+    if(i==int(N/5)) {temp = 1.2; cout << "Changing temperature T*: 1.0 --> 1.2" << endl;}
 
-    if((i+1)%(N/5)==0){
+    if((i+1)%(5000)==0){
       cout << "Thermalization process is running, step " << i+1 << "/" << N << ". Rescaling velocities." << endl;
+      cout << "The kinetic energy is evaluated using the last" << mean_v2_history.size() << " istant measures." << endl;
       rescale_velocities(mean_v2_history);
       mean_v2_history.clear();
+      hist_count = 0;
     }
     if(i%100==0) Measure(true);
+    hist_count++;
 
-    Move();
   }
   set_restart("true","false");
   cout << "This is the end of the thermalization phase, let's the simulation begin. " << endl;
@@ -233,18 +239,21 @@ void blocking_on_MD(int M, int N, string filename){
     vector<double> meas(n_props,0);
     for(int k=0; k<L; k++){
       Move();
-      if(k%1==0){
-        Measure(true);
-        meas.at(iv)+=stima_pot;
-        meas.at(ik)+=stima_kin;
-        meas.at(ie)+=stima_etot;
-        meas.at(it)+=stima_temp;
-        for(int ibin=4; ibin<n_props; ibin++){
-           r = (ibin-4)*bin_size;
-           stima_gofr[ibin-4] /= rho * npart * (((4 * pi )/ 3)* (pow(r + bin_size, 3) - pow(r, 3)));
-           meas.at(ibin) += stima_gofr[ibin-4];
-        }
+
+      // istant print only of the 100-th measure
+      if(k%100==0)Measure(true);
+      else Measure(false);
+
+      meas.at(iv)+=stima_pot;
+      meas.at(ik)+=stima_kin;
+      meas.at(ie)+=stima_etot;
+      meas.at(it)+=stima_temp;
+      for(int ibin=4; ibin<n_props; ibin++){
+          r = (ibin-4)*bin_size;
+          stima_gofr[ibin-4] /= rho * npart * (((4 * pi )/ 3)* (pow(r + bin_size, 3) - pow(r, 3)));
+          meas.at(ibin) += stima_gofr[ibin-4];
       }
+
     }
 
     for(int j=0; j<n_props; j++){
