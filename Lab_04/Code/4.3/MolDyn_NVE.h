@@ -46,7 +46,7 @@ void blocking_on_MD(int, int, string);
 double error(double, double, unsigned int);
 
 //functions
-void Equilibrate_system(int);
+void Equilibrate_system(int, double, double, int);
 double eval_mean_v2();
 void set_restart(string, string);
 void rescale_velocities(vector<double>);

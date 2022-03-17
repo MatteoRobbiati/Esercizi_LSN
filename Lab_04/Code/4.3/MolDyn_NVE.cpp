@@ -23,12 +23,18 @@ using namespace std;
 
 int main(){
 
-  int M = 3e5;
+  int M = 1e6;
   int N = 100;
-  string filename = "Risultati_belli/ave_gas.dat";
+  int Nequi = 45000;
+  // they are different only in the gas phase
+  double T_i = 0.9;
+  double T_f = 1.2;
+  int Nrescales = 15;
+
+  string filename = "../../Results/ave_gas.dat";
 
   Input();
-  if(restart=="true") Equilibrate_system(50000);
+  if(restart=="true") Equilibrate_system(Nequi, T_i, T_f, Nrescales);
   blocking_on_MD(M, N, filename);
   ConfFinal();
 
@@ -86,7 +92,7 @@ void Input(void){ //Prepare all stuff for the simulation
 
   if(restart=="true"){
     cout << "Read initial configuration from file config.0 " << endl << endl;
-    ReadConf.open("config.0");
+    ReadConf.open("liquid.0");
     for (int i=0; i<npart; ++i){
       ReadConf >> x[i] >> y[i] >> z[i];
       x[i] = x[i] * box;
@@ -156,29 +162,36 @@ void Input(void){ //Prepare all stuff for the simulation
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ THERMALIZATION PHASE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void Equilibrate_system(int N){
+void Equilibrate_system(int N, double T_i, double T_f, int N_resc){
 
   cout << "####################################################################" << endl;
   cout << "Thermalization phase of the simulation." << endl;
   cout << "Running "<< N << " steps that will be ignored at the end of this phase." << endl << endl;
   cout << "####################################################################" << endl;
 
+  int irescale = int(N/N_resc);
+
+  int hist_dimension = 100;
+  int hist_count     = 0;
+  vector<double> mean_v2_history;
+
   for(int i=0; i<N; i++){
 
-    vector<double> mean_v2_history;
-    mean_v2_history.push_back(eval_mean_v2());
+    Move();
+    if(hist_count > (irescale)-100) mean_v2_history.push_back(eval_mean_v2());
 
-    //if(i==N/10){temp = 1.1; cout << "Changing temperature T*: 1.0 --> 1.1" << endl;}
-    if(i==10000) {temp = 1.2; cout << "Changing temperature T*: 1.0 --> 1.2" << endl;}
+    if(i==int(N/10)) {temp = T_f; cout << "Changing temperature T*: " << T_i << " --> " << T_f << endl;}
 
-    if((i+1)%(N/5)==0){
+    if((i+1)%(irescale)==0){
       cout << "Thermalization process is running, step " << i+1 << "/" << N << ". Rescaling velocities." << endl;
+      cout << "The kinetic energy is evaluated using the last" << mean_v2_history.size() << " istant measures." << endl;
       rescale_velocities(mean_v2_history);
       mean_v2_history.clear();
+      hist_count = 0;
     }
-    if(i%100==0) Measure(true);
+    if(i%1==0) Measure(true);
+    hist_count++;
 
-    Move();
   }
   set_restart("true","false");
   cout << "This is the end of the thermalization phase, let's the simulation begin. " << endl;
@@ -219,21 +232,20 @@ void blocking_on_MD(int M, int N, string filename){
 
   cout << "Starting simulation with blocking. " << endl;
   for(unsigned int i=0; i<N; i++){
-    if((i)%10==0) cout << "Running block " << i << " of " << N << endl;
+    if((i)%1==0) cout << "Running block " << i << " of " << N << endl;
     vector<double> meas(n_props,0);
     for(int k=0; k<L; k++){
       Move();
-      if(k%100==0){
-        Measure(true);
-        meas.at(iv)+=stima_pot;
-        meas.at(ik)+=stima_kin;
-        meas.at(ie)+=stima_etot;
-        meas.at(it)+=stima_temp;
-      }
+      if(k%1==0) Measure(true);
+      else         Measure(false);
+      meas.at(iv)+=stima_pot;
+      meas.at(ik)+=stima_kin;
+      meas.at(ie)+=stima_etot;
+      meas.at(it)+=stima_temp;
     }
     for(int j=0; j<n_props; j++){
-      sum.at(j) += meas.at(j)/(L/10.);
-      sum2.at(j)+= (meas.at(j)/(L/10.))*(meas.at(j)/(L/10.));
+      sum.at(j) += meas.at(j)/(L);
+      sum2.at(j)+= (meas.at(j)/(L))*(meas.at(j)/(L));
       out << setprecision(8)  << sum.at(j)/(i+1) << "   " << setprecision(8) << error(sum.at(j)/(i+1), sum2.at(j)/(i+1), i) << "   ";
     }
     out << endl;
