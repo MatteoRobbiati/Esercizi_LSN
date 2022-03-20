@@ -8,4 +8,4 @@ Monte_Carlo_NVT.o : Monte_Carlo_NVT.cpp
 random.o : random.cpp random.h
 	$(CC) -c random.cpp -o random.o $(CFLAGS)
 clean :
-	rm *.o Monte_Carlo_NVT.exe istant_output.dat *output*
+	rm *.o Monte_Carlo_NVT.exe *output*

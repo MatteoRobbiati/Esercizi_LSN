@@ -23,12 +23,12 @@ using namespace std;
 
 int main(){
 
-  int M = 2e5;
-  int N = 100;
-  string filename = "../../Results/gofr_NVE_gas_50000.dat";
+  int M = 250000;
+  int N = 50;
+  string filename = "../../Results/gofr_NVE_liquid.dat";
 
   Input();
-  if(restart=="true") Equilibrate_system(50000);
+  if(restart=="true") Equilibrate_system(3000);
   blocking_on_MD(M, N, filename);
   ConfFinal();
 
@@ -179,12 +179,12 @@ void Equilibrate_system(int N){
   for(int i=0; i<N; i++){
 
     Move();
-    if(hist_count > 4900) mean_v2_history.push_back(eval_mean_v2());
+    if(hist_count > 220) mean_v2_history.push_back(eval_mean_v2());
 
-    if(i==int(N/10)){temp = 1.0; cout << "Changing temperature T*: 0.8 --> 1.0" << endl;}
-    if(i==int(N/5)) {temp = 1.2; cout << "Changing temperature T*: 1.0 --> 1.2" << endl;}
+    //if(i==int(N/10)){temp = 1.0; cout << "Changing temperature T*: 0.8 --> 1.0" << endl;}
+    //if(i==int(N/5)) {temp = 1.2; cout << "Changing temperature T*: 1.0 --> 1.2" << endl;}
 
-    if((i+1)%(5000)==0){
+    if((i+1)%(300)==0){
       cout << "Thermalization process is running, step " << i+1 << "/" << N << ". Rescaling velocities." << endl;
       cout << "The kinetic energy is evaluated using the last" << mean_v2_history.size() << " istant measures." << endl;
       rescale_velocities(mean_v2_history);
@@ -235,7 +235,7 @@ void blocking_on_MD(int M, int N, string filename){
 
   cout << "Starting simulation with blocking. " << endl;
   for(unsigned int i=0; i<N; i++){
-    if((i)%2==0) cout << "Running block " << i << " of " << N << endl;
+    if((i)%5==0) cout << "Running block " << i << " of " << N << endl;
     vector<double> meas(n_props,0);
     for(int k=0; k<L; k++){
       Move();

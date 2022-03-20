@@ -23,7 +23,7 @@ using namespace std;
 int main(){
 
   Input(); //Inizialization
-  Equilibrate_system(10000);
+  Equilibrate_system(2000);
   Single_run();
   ConfFinal(); //Write final configuration
 
@@ -54,7 +54,6 @@ void Equilibrate_system(int equi_steps){
     cout << "Equilibration phase is running, walker will be moved " << equi_steps << " times" << endl;
     cout << "And those values will be ignored." << endl;   // Moving for equi_steps-time the walker
     for(int i=0; i<equi_steps; i++){
-      if(i%250==0) cout << "Equilibration step " << i << endl;
       Move();
       if(i%iprint==0) Measure(true);
       else            Measure(false);
@@ -63,6 +62,7 @@ void Equilibrate_system(int equi_steps){
   }else{
     cout << "No equilibration phase needed " << endl;
   }
+  cout << "This is the end of the equilibration phase." << endl;
   return;
 }
 
@@ -360,8 +360,10 @@ void Averages(int iblk){
    ofstream Gofr, Gave, Epot, Pres;
    const int wd=12;
 
-    cout << "Block number " << iblk << endl;
-    cout << "Acceptance rate " << accepted/attempted << endl << endl;
+   if(iblk%2==0){
+     cout << "Block number " << iblk << endl;
+     cout << "Acceptance rate " << accepted/attempted << endl << endl;
+   }
 
     Epot.open("output.epot.0",ios::app);
     Pres.open("output.pres.0",ios::app);
@@ -403,7 +405,7 @@ void Averages(int iblk){
 	  }
   }
 
-  cout << "----------------------------" << endl << endl;
+//  cout << "----------------------------" << endl << endl;
 
   Epot.close();
   Pres.close();
