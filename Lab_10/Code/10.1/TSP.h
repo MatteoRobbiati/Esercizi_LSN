@@ -54,7 +54,7 @@ class Salesman{
     void translation_mutation();
 
     //void crossover(Chromo, Chromo);
-    void simulated_annealing(double, double, int, int);
+    void simulated_annealing(double, double, int, int, string);
 };
 
 #endif

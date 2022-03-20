@@ -1,4 +1,4 @@
-#include "TSP.h"
+  #include "TSP.h"
 #include <cmath>
 #include <fstream>
 #include <algorithm>
@@ -327,7 +327,7 @@ int Salesman::PBC(int index){
 // ~~~~~~~~~~~~~~~~~~~ SIMULATED ANNNEALING METHOD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-void Salesman::simulated_annealing(double betai, double betaf, int Nstep, int Nmoves){
+void Salesman::simulated_annealing(double betai, double betaf, int Nstep, int Nmoves, string nomefile){
 
   cout << "*******************************************************" << endl;
   cout << "*** The simulated annealing process is starting now ***" << endl;
@@ -338,7 +338,7 @@ void Salesman::simulated_annealing(double betai, double betaf, int Nstep, int Nm
   cout << " Initial Energy = " << Eval_fitness(_old_chromo) << endl << endl;
 
   ofstream out;
-  out.open("../../Results/show_annealing.dat");
+  out.open(nomefile);
 
   double Eold, Enew, p;
   int accepted = 0, attempted = 0;
@@ -348,7 +348,7 @@ void Salesman::simulated_annealing(double betai, double betaf, int Nstep, int Nm
 
   for(int i=0; i<Nstep; i++){
 
-    beta += dbeta*i;
+    beta += dbeta;
     if(i%99 == 0) cout << "Step " << i+1 << " is running at T = " << 1./beta << endl;
     accepted  = 0;
     attempted = 0;
