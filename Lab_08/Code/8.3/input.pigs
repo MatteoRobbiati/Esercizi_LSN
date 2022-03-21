@@ -1,16 +1,16 @@
 timeslices			    300
 temperature		            0.0
-imaginaryTimePropagation	    2.0
-                                                                                                                 
-brownianMotionReconstructions       60
-delta_translation		    0.6
-brownianBridgeReconstructions	    120
-brownianBridgeAttempts		    4
-                                                                                                                 
+imaginaryTimePropagation	    0.3
+
+brownianMotionReconstructions     160
+delta_translation		              2.5
+brownianBridgeReconstructions	    160
+brownianBridgeAttempts		        18
+
 MCSTEPS			            4000
 equilibration		            2000
 blocks			            20
-                                                                                                                 
+
 histogram_bins	                    400
 histogram_start	                   -5
 histogram_end		            5
@@ -19,7 +19,7 @@ timeslices_interval_for_averages    120 180
 potential_type                      1
 wf_type                             1
 
-mu                                  0.8
+mu                                  0.81
 sigma                               0.62
 
 

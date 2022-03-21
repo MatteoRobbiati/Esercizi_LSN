@@ -1,11 +1,11 @@
-timeslices				30
-temperature				0.1
-imaginaryTimePropagation		8.0
+timeslices				100
+temperature				0.5
+imaginaryTimePropagation		2.0
                                                                                                                  
 brownianMotionReconstructions           0
-delta_translation			0.5
-brownianBridgeReconstructions		8
-brownianBridgeAttempts			4
+delta_translation			1.45
+brownianBridgeReconstructions		80
+brownianBridgeAttempts			40
                                                                                                                  
 MCSTEPS					4000
 equilibration				2000
