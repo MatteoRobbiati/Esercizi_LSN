@@ -1,6 +1,6 @@
 timeslices			    300
 temperature		            0.0
-imaginaryTimePropagation	    0.3
+imaginaryTimePropagation	    0.5
 
 brownianMotionReconstructions     160
 delta_translation		              2.5

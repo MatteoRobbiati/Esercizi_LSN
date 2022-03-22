@@ -3,6 +3,8 @@
 #include "random.h"
 #include "measure.h"
 #include "thismeasure.h"
+#include <iomanip>
+#include <stdio.h>
 #include <vector>
 
 using namespace std;
@@ -29,13 +31,13 @@ int main(int argc, char* argv[]){
   // calcolo chiquad usando i campionamenti di ogni sezione messi a confronto con il valore atteso
 
   out.open("../../Results/chiquad.dat", ios::out | ios::trunc);
-  for(int j=0; j<N; j++){
+  for(int j=0; j<100; j++){
     vector<double> counter(N,0);
     for(int i=0; i<M; i++){
       int rand = int(mystat.uniform_sampling(0,1)*100);
       counter.at(rand)++;
     }
-    out << mystat.chiquad(counter, M/N, true) << endl;        // stampo così da plottare
+    out << setprecision(6) << mystat.chiquad(counter, M/N, true) << endl;        // stampo così da plottare
   }                                                           // l'istogramma
 
   out.close();
