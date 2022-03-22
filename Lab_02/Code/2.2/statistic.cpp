@@ -32,7 +32,8 @@ void Statistic::blocking(int M, int N, Measure *measure, const char* filename){
     for(int j=0; j<dim; j++){
       sum.at(j)+=meas.at(j)/L;
       sum2.at(j)+=(meas.at(j)/L)*(meas.at(j)/L);
-      if(i==N-1) out << sqrt(sum.at(j)/(i+1)) << "   " << (error(sum.at(j)/(i+1), sum2.at(j)/(i+1), i)/sqrt(N))/(2*sqrt(sum.at(j)/(i+1))) << endl;
+      double errore = error(sum.at(j)/(i+1), sum2.at(j)/(i+1), i);
+      if(i==N-1) out << sqrt(sum.at(j)/(i+1)) << "   " << errore / (2*sqrt(sum.at(j)/(i+1))) << endl;
     }
   }
   out.close();
