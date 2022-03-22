@@ -12,6 +12,9 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 #include <fstream>      // Stream class to both read and write from/to files.
 #include <string>
 #include <vector>
+#include <numeric>
+#include <algorithm>
+#include <iomanip>
 #include <stdio.h>
 #include <cmath>        // rint, pow
 #include "MolDyn_NVE.h"
@@ -19,20 +22,21 @@ _/    _/  _/_/_/  _/_/_/_/ email: Davide.Galli@unimi.it
 using namespace std;
 
 int main(){
-  Equilibrate_system(1000);
-  Input();
-  int nconf = 1;
 
-  for(int istep=1; istep <= nstep; ++istep){
-     Move();
-     if(istep%250 == 0) cout << "Number of time-steps: " << istep << endl;
-     if(istep%10 == 0){
-        Measure(true);     //Properties measurement
-//        ConfXYZ(nconf);//Write actual configuration in XYZ format //Commented to avoid "filesystem full"!
-        nconf += 1;
-     }
-  }
-  ConfFinal();         //Write final configuration to restart
+  int M = 5000;
+  int N = 100;
+  int Nequi = 1000;
+  // they are different only in the gas phase
+  double T_i = 0.8;
+  double T_f = 0.8;
+  int Nrescales = 4;
+
+  string filename = "../../Results/ave_4.1.dat";
+
+  Input();
+  if(restart=="true") Equilibrate_system(Nequi, T_i, T_f, Nrescales);
+  blocking_on_MD(M, N, filename);
+  ConfFinal();
 
   return 0;
 }
@@ -61,18 +65,18 @@ void Input(void){ //Prepare all stuff for the simulation
   ReadInput >> restart;
 
   if(restart=="false"){
-  cout << "Classic Lennard-Jones fluid        " << endl;
-  cout << "Molecular dynamics simulation in NVE ensemble  " << endl << endl;
-  cout << "Interatomic potential v(r) = 4 * [(1/r)^12 - (1/r)^6]" << endl << endl;
-  cout << "The program uses Lennard-Jones units " << endl;
-  cout << "Number of particles = " << npart << endl;
-  cout << "Density of particles = " << rho << endl;
-  cout << "Volume of the simulation box = " << vol << endl;
-  cout << "Edge of the simulation box = " << box << endl;
-  cout << "The program integrates Newton equations with the Verlet method " << endl;
-  cout << "Time step = " << delta << endl;
-  cout << "Number of steps = " << nstep << endl << endl;
-}
+    cout << "Classic Lennard-Jones fluid        " << endl;
+    cout << "Molecular dynamics simulation in NVE ensemble  " << endl << endl;
+    cout << "Interatomic potential v(r) = 4 * [(1/r)^12 - (1/r)^6]" << endl << endl;
+    cout << "The program uses Lennard-Jones units " << endl;
+    cout << "Number of particles = " << npart << endl;
+    cout << "Density of particles = " << rho << endl;
+    cout << "Volume of the simulation box = " << vol << endl;
+    cout << "Edge of the simulation box = " << box << endl;
+    cout << "The program integrates Newton equations with the Verlet method " << endl;
+    cout << "Time step = " << delta << endl;
+    cout << "Number of steps = " << nstep << endl << endl;
+  }
   ReadInput.close();
 
 //Prepare array for measurements
@@ -156,21 +160,36 @@ void Input(void){ //Prepare all stuff for the simulation
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~ THERMALIZATION PHASE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-void Equilibrate_system(int N){
+void Equilibrate_system(int N, double T_i, double T_f, int N_resc){
 
   cout << "####################################################################" << endl;
   cout << "Thermalization phase of the simulation." << endl;
-  cout << "Running " << N << " steps that will be ignored at the end of this phase." << endl << endl;
+  cout << "Running "<< N << " steps that will be ignored at the end of this phase." << endl << endl;
   cout << "####################################################################" << endl;
 
-  Input();
+  int irescale = int(N/N_resc);
+
+  int hist_dimension = 100;
+  int hist_count     = 0;
+  vector<double> mean_v2_history;
+
   for(int i=0; i<N; i++){
-    if((i )%100==0){
-      cout << "Thermalization process is running, step " << i+1 << "/10000. Rescaling velocities." << endl;
-      rescale_velocities();
+
+    Move();
+    if(hist_count > (irescale)-100) mean_v2_history.push_back(eval_mean_v2());
+
+    //if(i==int(N/10)) {temp = T_f; cout << "Changing temperature T*: " << T_i << " --> " << T_f << endl;}
+
+    if((i+1)%(irescale)==0){
+      cout << "Thermalization process is running, step " << i+1 << "/" << N << ". Rescaling velocities." << endl;
+      cout << "The kinetic energy is evaluated using the last" << mean_v2_history.size() << " istant measures." << endl;
+      rescale_velocities(mean_v2_history);
+      mean_v2_history.clear();
+      hist_count = 0;
     }
     if(i%10==0) Measure(true);
-    Move();
+    hist_count++;
+
   }
   set_restart("true","false");
   cout << "This is the end of the thermalization phase, let's the simulation begin. " << endl;
@@ -210,21 +229,22 @@ void blocking_on_MD(int M, int N, string filename){
   vector<double> sum2(n_props,0);
 
   cout << "Starting simulation with blocking. " << endl;
-  for(int i=0; i<N; i++){
-    if((i+1)%25) cout << "Running block " << i << " of " << N << endl;
+  for(unsigned int i=0; i<N; i++){
+    if((i)%1==0) cout << "Running block " << i << " of " << N << endl;
     vector<double> meas(n_props,0);
     for(int k=0; k<L; k++){
       Move();
-      Measure(false);
+      if(k%10==0)  Measure(true);
+      else         Measure(false);
       meas.at(iv)+=stima_pot;
       meas.at(ik)+=stima_kin;
       meas.at(ie)+=stima_etot;
       meas.at(it)+=stima_temp;
     }
     for(int j=0; j<n_props; j++){
-      sum.at(j) += meas.at(j)/L;
-      sum2.at(j)+= (meas.at(j)/L)*(meas.at(j)/L);
-      out << sum.at(j)/(i+1) << "   " << error(sum.at(j)/(i+1), sum2.at(j)/(i+1), i) << "   ";
+      sum.at(j) += meas.at(j)/(L);
+      sum2.at(j)+= (meas.at(j)/(L))*(meas.at(j)/(L));
+      out << setprecision(8)  << sum.at(j)/(i+1) << "   " << setprecision(8) << error(sum.at(j)/(i+1), sum2.at(j)/(i+1), i) << "   ";
     }
     out << endl;
   }
@@ -271,20 +291,36 @@ void Move(void){ //Move particles with Verlet algorithm
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RESCALING VELOCITIES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ at first, accumulate a certain number of mean_v2 ~~~~~~~~~~~~~~~
 
-void rescale_velocities(){
+double eval_mean_v2(){
+  double mean_v2 = 0;
 
-  double sumv2 = 0.0;
-  double fs=0.0;
   for(int i=0; i<npart; i++){
     vx[i] = Pbc(x[i] - xold[i])/(delta);
     vy[i] = Pbc(y[i] - yold[i])/(delta);
     vz[i] = Pbc(z[i] - zold[i])/(delta);
-    sumv2+=vx[i]*vx[i] + vy[i]*vy[i] + vz[i]*vz[i];
+    mean_v2+=vx[i]*vx[i] + vy[i]*vy[i] + vz[i]*vz[i];
   }
-  sumv2 /= (double)npart;
+
+  mean_v2 /= (double)npart;
+  return mean_v2;
+}
+
+// ~~~~~~~~~~~~~ then use them for calculating a more stable value of sumv2 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+void rescale_velocities(vector<double> history_kin){
+
+  double fs       = 0.0;
+  double sumv2    = 0.0;
+
+  for(unsigned int i=0; i<history_kin.size(); i++) sumv2 += history_kin.at(i);
+
+  sumv2 /= history_kin.size();
+  cout << "Media delle velocità medie calcolate: " << sumv2 << endl;
 
   fs = sqrt(3 * temp / sumv2);   // fs = velocity scale factor
+
   cout << "Scale factor is " << fs << endl;
   for (int i=0; i<npart; ++i){
     vx[i] *= fs;
@@ -326,8 +362,18 @@ double Force(int ip, int idir){ //Compute forces as -Grad_ip V(r)
 
 void Measure(bool print_istant){ //Properties measurement
   int bin;
-  double v, t, vij;
+  long double v, t, vij;
   double dx, dy, dz, dr;
+  ofstream Epot, Ekin, Etot, Temp;
+
+
+  if(print_istant==true){
+
+    Epot.open("output_epot.dat",ios::app);
+    Ekin.open("output_ekin.dat",ios::app);
+    Temp.open("output_temp.dat",ios::app);
+    Etot.open("output_etot.dat",ios::app);
+  }
 
   v = 0.0; //reset observables
   t = 0.0;
@@ -355,19 +401,12 @@ void Measure(bool print_istant){ //Properties measurement
 //Kinetic energy
   for (int i=0; i<npart; ++i) t += 0.5 * (vx[i]*vx[i] + vy[i]*vy[i] + vz[i]*vz[i]);
 
-  stima_pot = v/(double)npart; //Potential energy per particle
-  stima_kin = t/(double)npart; //Kinetic energy per particle
-  stima_temp = (2.0 / 3.0) * t/(double)npart; //Temperature
-  stima_etot = (t+v)/(double)npart; //Total energy per particle
+  stima_pot  = (v/(double)npart); //Potential energy per particle
+  stima_kin  = (t/(double)npart); //Kinetic energy per particle
+  stima_temp = ((2.0 / 3.0) * t/(double)npart); //Temperature
+  stima_etot = ((t+v)/(long double)npart); //Total energy per particle
 
   if(print_istant==true){
-    ofstream Epot, Ekin, Etot, Temp;
-
-    Epot.open("output_epot.dat",ios::app);
-    Ekin.open("output_ekin.dat",ios::app);
-    Temp.open("output_temp.dat",ios::app);
-    Etot.open("output_etot.dat",ios::app);
-
     Epot << stima_pot  << endl;
     Ekin << stima_kin  << endl;
     Temp << stima_temp << endl;
@@ -390,7 +429,7 @@ void ConfFinal(void){ //Write final configuration
 
   cout << "Print final configuration to file config.final " << endl << endl;
   WriteConf.open("config.final");
-  WriteOld.open("old.final", ios::out | ios::trunc);
+  WriteOld.open("old.final");
 
   for (int i=0; i<npart; ++i){
     WriteConf << x[i]/box    << "   " <<  y[i]/box    << "   " << z[i]/box << endl;
