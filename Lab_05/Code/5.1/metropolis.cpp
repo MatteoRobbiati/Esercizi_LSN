@@ -27,7 +27,15 @@ Metropolis::~Metropolis(){
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void Metropolis::Equilibrate(int Nequi){
-  for(int i=0; i<Nequi; i++) try_step();
+  ofstream out;
+  out.open("../../Results/equilibration.dat");
+
+  for(int i=0; i<Nequi; i++){
+    try_step();
+    out << _x->get_radius() << endl;
+  }
+
+  out.close();
   return;
 }
 
