@@ -13,9 +13,9 @@ int main(int argc, char* argv[]){
 
   // some useful variables
 
-  int M = 1e6;
-  double step_100 = 1.235;
-  double step_210 = 2.955;
+  int M = 1e7;
+  double step_100 [] = {1.235, 0.75};
+  double step_210 [] = {2.955, 1.85};
 
   string meth [] = {"uniform", "gaussian"};
 
@@ -25,16 +25,16 @@ int main(int argc, char* argv[]){
 
   // some useful positions in the 3d space; Position is a specific class
 
-  Position *start  = new Position(50.,50.,50., rnd);
+  Position *start  = new Position(0.,0.,0., rnd);
   vector<double> coord  = start->get_coordinates();           // saving start position
   vector<double> origin(3,0.);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   // Simulating the orbitals: pdf is a virtual class whose implementation are hydro_100 and hydro_210
 
-  cout << "Running Metropolis algo for simulating |100> and |210> states of hydrogen. " << endl;
+/*  cout << "Running Metropolis algo for simulating |100> and |210> states of hydrogen. " << endl;
 
-  pdf *hydrogen = new hydro_100();/*
+*/  pdf *hydrogen = new hydro_100(); /*
   Metropolis *Metro_100 = new Metropolis(M, hydrogen, start, rnd, step_100, "uniform");
   Metro_100->Equilibrate(1000);
   Metro_100->run("../../Results/H100.dat");
@@ -43,11 +43,11 @@ int main(int argc, char* argv[]){
 //  start->set_coordinates(coord);                              // starting from the old start
 
   //2. uniform step - H100
-  hydrogen = new hydro_210();
+/*  hydrogen = new hydro_210();
   Metropolis *Metro_210 = new Metropolis(M, hydrogen, start, rnd, step_210, "uniform");
   Metro_210->Equilibrate(1000);
   Metro_210->run("../../Results/H210.dat");
-  cout << "rate hydrogen |210>: " << Metro_210->rate_of_acceptance() << endl;/*
+  cout << "rate hydrogen |210>: " << Metro_210->rate_of_acceptance() << endl;*/
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -62,7 +62,7 @@ int main(int argc, char* argv[]){
 
     cout << "Running blocking for |100> and |210> using " << meth[imeth] << " steps." << endl;
     hydrogen = new hydro_100();
-    Measure *measure_100 = new Metropolis(M, hydrogen, start, rnd, step_100, meth[imeth]);
+    Measure *measure_100 = new Metropolis(M, hydrogen, start, rnd, step_100[imeth], meth[imeth]);
     string path = "../../Results/"+meth[imeth]+"_blockin_on_100.dat";
     mystat->blocking(M, 100, measure_100, path);
 
@@ -70,10 +70,10 @@ int main(int argc, char* argv[]){
     start->set_coordinates(coord);
 
     hydrogen = new hydro_210();
-    Measure *measure_210 = new Metropolis(M, hydrogen, start, rnd, step_210, meth[imeth]);
+    Measure *measure_210 = new Metropolis(M, hydrogen, start, rnd, step_210[imeth], meth[imeth]);
     path = "../../Results/"+meth[imeth]+"_blockin_on_210.dat";
     mystat->blocking(M, 100, measure_210, path);
-  }*/
+  }
 
 
 
