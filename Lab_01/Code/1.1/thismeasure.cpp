@@ -8,7 +8,7 @@
 using namespace std;
 
 ThisMeasure :: ThisMeasure(Random rnd){
-  _dim = 2;
+  _dim = 2;                                       // valore e scarto quadratico in questo caso
   _rnd = rnd;
   _rnd.Init();
 };
@@ -22,7 +22,7 @@ int ThisMeasure :: get_dimension(){
 }
 
 vector<double> ThisMeasure :: get_measure(){
-  vector<double> meas;
+  vector<double> meas;                            // qui implemento la misura
   double r = _rnd.Rannyu();
   meas.push_back(r);
   meas.push_back((r-0.5)*(r-0.5));

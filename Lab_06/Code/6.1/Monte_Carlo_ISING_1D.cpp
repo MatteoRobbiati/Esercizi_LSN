@@ -146,6 +146,7 @@ void Input(string initial_condition, bool print){
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HOW TO PREPARE CONFIG.0 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+// all +1 if T=0 and randomly +/- 1 if T=inf
 void prepare_initial_config(string init, string filename){
   ofstream out;
   out.open(filename);
@@ -220,7 +221,7 @@ void Move(int metro)
         s[o] *= -1;
         accepted += 1;
       }
-    }
+    }                                                          // Gibbs
     else{
       deltaE = -2 * Boltzmann(s[o], o) * s[o]; // s[o] * s[o] = 1
       p = 1./(1 + exp(-beta * deltaE)); // probability to have p( s_o = 1 | {s_j : j=/=o})

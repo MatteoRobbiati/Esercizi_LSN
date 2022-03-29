@@ -22,10 +22,10 @@ using namespace std;
 
 int main(){
 
-  Input(); //Inizialization
-  Equilibrate_system(2000);
-  Single_run();
-  ConfFinal(); //Write final configuration
+  Input();                       // Inizialization
+  Equilibrate_system(2000);      // Equilibration
+  Single_run();                  // A blocking run
+  ConfFinal();                   // Write final configuration
 
   return 0;
 }

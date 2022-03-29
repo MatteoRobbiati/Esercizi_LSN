@@ -23,9 +23,9 @@ using namespace std;
 
 int main(){
 
-  Read_input();
-  Equilibrate_system(10000);
-  Single_run(mu, sigma);
+  Read_input();                // input
+  Equilibrate_system(10000);   // equilibration
+  Single_run(mu, sigma);       // a single run of blocking
 
   return 0;
 }
@@ -79,6 +79,7 @@ void Read_input(){
   in >> nblk;
   in >> nstep;
 
+  // some generalities of the simulation
   if(explore==0){
     cout << "Code is running with a single evaluation of the energy. " << endl;
     cout << "It starts with the choice: (mu, sigma) = (" << mu << ", " << sigma << ")" << endl;
@@ -136,7 +137,7 @@ void Equilibrate_system(int equi_steps){
 
 
 void Move(){
-
+  // metropolis uses squared modulus of the wave-function
   double x_new = x + rnd.Rannyu(-stepsize, stepsize);
   double alpha = min(1., p(x_new)/p(x));
   double ran   = rnd.Rannyu();
@@ -163,24 +164,28 @@ void Measure(){
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+// gaussian
 double gauss(double x, double mu, double sigma){
   return exp(-(x-mu)*(x-mu)/(2.*sigma*sigma));
 }
 
-
+// WF
 double psi(double x, double mu, double sigma){
   return gauss(x, mu, sigma)+gauss(x, -mu, sigma);
 }
 
+// action of H on WF in x
 double apply_H(double mu, double sigma){
   double kin = 1./(2*sigma*sigma)*(1.-1./psi(x, mu, sigma)*((x-mu)*(x-mu)/(sigma*sigma)*gauss(x,mu,sigma)+(x+mu)*(x+mu)/(sigma*sigma)*gauss(x,-mu,sigma)));
   return kin;
 }
 
+// potential in x
 double eval_V(){
   return (x*x-2.5)*x*x;
 }
 
+// the p.d.f.
 double p(double x){
   return psi(x, mu, sigma)*psi(x, mu, sigma);
 }
@@ -240,6 +245,7 @@ double Error(double sum, double sum2, int iblk){
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Print x value on a file ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+// for the histogram
 void print_x(string filename){
   ofstream out;
   out.open(filename, ios::app);

@@ -33,9 +33,13 @@ int main(){
 
   string filename = "../../Results/ave_gas.dat";
 
+  // initial Input
   Input();
+  // starting with equilibraton
   if(restart=="true") Equilibrate_system(Nequi, T_i, T_f, Nrescales);
+  // the measure
   blocking_on_MD(M, N, filename);
+  // saving final configuration
   ConfFinal();
 
   return 0;
@@ -64,7 +68,6 @@ void Input(void){ //Prepare all stuff for the simulation
   ReadInput >> nstep;
   ReadInput >> iprint;
   ReadInput >> restart;
-  ReadInput >> iprint;
 
   if(restart=="false"){
     cout << "Classic Lennard-Jones fluid        " << endl;
@@ -139,6 +142,9 @@ void Input(void){ //Prepare all stuff for the simulation
     }
     SaveConf.close();
 
+    // restart is not true means that we are starting the simulation PHASE
+    // and we use the positions gained with the equilibration process
+
   } else if (restart=="false"){
       cout << "Restart is false: opening old.0 and using it for defining r(t-dt)" << endl;
       ReadOld.open("old.final");
@@ -164,36 +170,39 @@ void Input(void){ //Prepare all stuff for the simulation
 
 void Equilibrate_system(int N, double T_i, double T_f, int N_resc){
 
+  // some infos
   cout << "####################################################################" << endl;
   cout << "Thermalization phase of the simulation." << endl;
   cout << "Running "<< N << " steps that will be ignored at the end of this phase." << endl << endl;
   cout << "####################################################################" << endl;
 
+  // indexes for rescalation of v
   int irescale = int(N/N_resc);
 
-  int hist_dimension = 100;
-  int hist_count     = 0;
-  vector<double> mean_v2_history;
+  // how many steps of Verlet count for the estimation of the v2 used for rescaling v?
+  int hist_dimension = 100;          // in this case 100
+  int hist_count     = 0;            // counter useful for accumulating v2 values
+  vector<double> mean_v2_history;    // here
 
   for(int i=0; i<N; i++){
 
     Move();
-    if(hist_count > (irescale)-100) mean_v2_history.push_back(eval_mean_v2());
+    if(hist_count > (irescale)-100) mean_v2_history.push_back(eval_mean_v2());          // accumulating the 100 values pre-rescaling
 
-    if(i==int(N/10)) {temp = T_f; cout << "Changing temperature T*: " << T_i << " --> " << T_f << endl;}
+    if(i==int(N/10)) {temp = T_f; cout << "Changing temperature T*: " << T_i << " --> " << T_f << endl;}   // T changes
 
-    if((i+1)%(irescale)==0){
+    if((i+1)%(irescale)==0){     // rescaling process each irescale steps
       cout << "Thermalization process is running, step " << i+1 << "/" << N << ". Rescaling velocities." << endl;
       cout << "The kinetic energy is evaluated using the last" << mean_v2_history.size() << " istant measures." << endl;
       rescale_velocities(mean_v2_history);
-      mean_v2_history.clear();
+      mean_v2_history.clear();                   // cleaning the objects
       hist_count = 0;
     }
     if(i%1==0) Measure(true);
     hist_count++;
 
   }
-  set_restart("true","false");
+  set_restart("true","false");                  // setting restart=false
   cout << "This is the end of the thermalization phase, let's the simulation begin. " << endl;
   cout << "####################################################################" << endl << endl;
 
@@ -236,7 +245,7 @@ void blocking_on_MD(int M, int N, string filename){
     vector<double> meas(n_props,0);
     for(int k=0; k<L; k++){
       Move();
-      if(k%1==0) Measure(true);
+      if(k%1==0)   Measure(true);             // 1 if i want to show measures for each Verlet's step
       else         Measure(false);
       meas.at(iv)+=stima_pot;
       meas.at(ik)+=stima_kin;
@@ -254,6 +263,7 @@ void blocking_on_MD(int M, int N, string filename){
   return;
 }
 
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~ err in BLOCKING ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 double error(double val, double val2, unsigned int k){
   if(k==0) return 0;
@@ -338,7 +348,7 @@ void rescale_velocities(vector<double> history_kin){
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ FORCE ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-double Force(int ip, int idir){ //Compute forces as -Grad_ip V(r)
+double Force(int ip, int idir){       //Compute forces as -Grad_ip V(r)
   double f=0.0;
   double dvec[3], dr;
 

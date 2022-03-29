@@ -20,8 +20,8 @@ Salesman::Salesman(int N, int pop_dim, string circuit, Random rnd){
   Prices.resize(N);
 
   for(int i=0; i<_N; i++) cities[i].resize(2);
-// Preparing matrix of prices
 
+// Preparing matrix of prices
   ifstream load_city;
   load_city.open(circuit);
   for(int i=0; i<_N; i++) load_city >> cities[i][0] >> cities[i][1];
@@ -35,6 +35,7 @@ Salesman::Salesman(int N, int pop_dim, string circuit, Random rnd){
 
   //show_prices();
 
+  //initializing the population
   for(int i=0; i<_Npop; i++){
     _pop[i].size = _N;
     _son[i].size = _N;
@@ -53,6 +54,7 @@ Salesman::Salesman(int N, int pop_dim, string circuit, Random rnd){
 
 Salesman::~Salesman(){
   delete _pop;
+  delete _son;
   _rnd.SaveSeed();
 }
 
@@ -162,20 +164,24 @@ void Salesman::save_chromo(int index, string filename, bool over){
 
 void Salesman::genetic_step(){
 
+  // two children Npop/2 times = Npop new guys
   for(int ipop=0; ipop<_Npop/2; ipop++){
-
+    // parents
     int x = _rnd.select_from_pop(_Npop, 0.05);
     int y = _rnd.select_from_pop(_Npop, 0.05);
 
     Chromo mum = _pop[x];
     Chromo dad = _pop[y];
 
+    //crossover
     crossover(mum,dad);
 
+    // appending the two children
     _son[ipop*2]   = mum;
     _son[ipop*2+1] = dad;
   }
 
+  //applying the mutations
   for(int i=0; i<_Npop; i++){
     shuffle_mutation(i);
     inverse_mutation(i);
@@ -183,9 +189,10 @@ void Salesman::genetic_step(){
     translation_mutation(i);
   }
 
+  // copying _son into _pop
   _pop = _son;
 
-
+  // sorting the population
   for(int i=0; i<_Npop; i++) _pop[i].cost = Eval_fitness(_pop[i]);
   sort_pop();
 
@@ -245,7 +252,6 @@ void Salesman::shuffle_mutation(int index){
   if(alpha < 0.06){
     int icity = int(_rnd.Rannyu()*(_N-4));
     random_shuffle(_son[index].tail.begin()+icity, _son[index].tail.begin()+icity+4);
-    //_pop[index].cost = Eval_fitness(_pop[index]);
   }
   return;
 }
@@ -256,7 +262,6 @@ void Salesman::inverse_mutation(int index){
     int i1 = int(_rnd.Rannyu()*(_N-1));
     int i2 = int(_rnd.Rannyu()*(_N-1));
     reverse(_son[index].tail.begin()+min(i1,i2), _son[index].tail.begin()+max(i1,i2));
-    //_pop[index].cost = Eval_fitness(_pop[index]);
   }
   return;
 }
@@ -270,7 +275,6 @@ void Salesman::translation_mutation(int index){
   if(alpha < 0.06){
     int ilen = _rnd.dice();
     for(int i=0; i<_N-1; i++) _son[index].tail[PBC(i+ilen)]=old_config.at(i);
-    //_pop[index].cost = Eval_fitness(_pop[index]);
   }
   return;
 }
@@ -282,11 +286,10 @@ void Salesman::swap_mutation(int index){
     int i1 = int(_rnd.Rannyu()*(_N-1));
     int i2 = int(_rnd.Rannyu()*(_N-1));
     iter_swap(_son[index].tail.begin()+i1, _son[index].tail.begin()+i2);
-    //_pop[index].cost = Eval_fitness(_pop[index]);
   }
   return;
 }
-// ~~~~~~~~~~~~~~~~~~~~~ A RUN OF NPOP/2 GENETIC STEPS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// ~~~~~~~~~~~~~~~~~~~~~ A complete genetic run ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void Salesman::run(int epochs){
   for(int i=0; i<epochs; i++){

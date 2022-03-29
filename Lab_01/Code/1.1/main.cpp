@@ -21,8 +21,6 @@ int main(int argc, char* argv[]){
 
   // PARTE 1
   // il metodo blocking è implementato in statistic.cpp.
-  // è composto da block_step, in cui genero le misure A[] (medie su L realizzazioni)
-  // e da blocking, cioè la media iterativa sulle misure A
   mystat.blocking(M, N, check_uniform, "../../Results/results.dat");
 
   // PARTE 2
@@ -38,7 +36,7 @@ int main(int argc, char* argv[]){
       counter.at(rand)++;
     }
     out << setprecision(6) << mystat.chiquad(counter, M/N, true) << endl;        // stampo così da plottare
-  }                                                           // l'istogramma
+  }                                                                              // l'istogramma
 
   out.close();
 

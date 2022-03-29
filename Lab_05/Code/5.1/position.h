@@ -6,14 +6,19 @@
 #include "random.h"
 
 class Position{
+
   private:
-    double _x, _y, _z;
+
+    double _x, _y, _z;                                   // cartesian coords
     Random* _rnd;
+
   public:
-    Position(Random* rnd);
+
+    Position(Random* rnd);                               // constructors and distructor
     Position(double x, double y, double z, Random* rnd);
     ~Position();
-    vector<double> get_coordinates();
+
+    vector<double> get_coordinates();                    
     void set_coordinates(vector<double> coord);
     void to_zero();
     double get_theta();

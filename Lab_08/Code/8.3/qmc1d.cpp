@@ -40,9 +40,6 @@ using namespace std;
 
 int main(){
 
-  //int taus[]  = {1, 2, 5, 8};
-
-  //for(int itau=0; itau<5; itau++){
   //  cout << "Executing PIGS evaluation using tau = " << taus[itau] << endl;
 
     readInput();
@@ -86,9 +83,7 @@ int main(){
   	finalizeHistogram();
 
 
-    //string new_name = "wf_var_"+to_string(taus[itau])+".dat";
 
-    //rename("probability.dat", new_name.c_str());
     cout << " ------------------------------------------------ " << endl;
     cout << endl;
   	deleteMemory();  // de-allocate dynamic variables.
@@ -197,6 +192,7 @@ void initialize(){
 
 // The external potential. You can modify this function but don't forget
 // to modify its first and second derivatives too !
+// added our potential used in case potential_type is equal to 1
 
 double external_potential(double val){
   if(potential_type==0){
@@ -231,6 +227,7 @@ double external_potential_second(double val){
 // The same applies to the variational Wave Function...
 // You can modify this function but don't forget
 // to modify its second derivative below!
+// added our WF used in case wf_type is equal to 1
 
 double gauss(double v, double mu, double sigma){
 	return exp(-(v-mu)*(v-mu)/(2*sigma*sigma));

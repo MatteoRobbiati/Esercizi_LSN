@@ -23,13 +23,13 @@ using namespace std;
 
 int main(){
 
-  int M = 250000;
-  int N = 50;
+  int M = 250000;     // realizations
+  int N = 50;         // blocks
   string filename = "../../Results/gofr_NVE_liquid.dat";
 
-  Input();
-  if(restart=="true") Equilibrate_system(3000);
-  blocking_on_MD(M, N, filename);
+  Input();                                          // input
+  if(restart=="true") Equilibrate_system(3000);     // equilibration if needed
+  blocking_on_MD(M, N, filename);                   // blocking
   ConfFinal();
 
   return 0;
@@ -58,7 +58,6 @@ void Input(void){ //Prepare all stuff for the simulation
   ReadInput >> nstep;
   ReadInput >> iprint;
   ReadInput >> restart;
-  ReadInput >> iprint;
 
   if(restart=="false"){
     cout << "Classic Lennard-Jones fluid        " << endl;
@@ -167,6 +166,8 @@ void Input(void){ //Prepare all stuff for the simulation
 
 void Equilibrate_system(int N){
 
+  // SAME COMMENTS DONE IN LAB_04
+
   cout << "####################################################################" << endl;
   cout << "Thermalization phase of the simulation." << endl;
   cout << "Running "<< N << " steps that will be ignored at the end of this phase." << endl << endl;
@@ -248,6 +249,8 @@ void blocking_on_MD(int M, int N, string filename){
       meas.at(ik)+=stima_kin;
       meas.at(ie)+=stima_etot;
       meas.at(it)+=stima_temp;
+      // here i need Nbin individual operations of blocking meth
+      // because each bin is a specific and different measure
       for(int ibin=4; ibin<n_props; ibin++){
           r = (ibin-4)*bin_size;
           stima_gofr[ibin-4] /= rho * npart * (((4 * pi )/ 3)* (pow(r + bin_size, 3) - pow(r, 3)));
@@ -259,6 +262,7 @@ void blocking_on_MD(int M, int N, string filename){
     for(int j=0; j<n_props; j++){
       sum.at(j) += meas.at(j)/(L/1.);
       sum2.at(j)+= (meas.at(j)/(L/1.))*(meas.at(j)/(L/1.));
+      // need setprecision for showing the Etot fluctuations
       out << setprecision(8)  << sum.at(j)/(i+1) << "   " << setprecision(8) << error(sum.at(j)/(i+1), sum2.at(j)/(i+1), i) << "   ";
     }
     out << endl;
@@ -307,6 +311,7 @@ void Move(void){ //Move particles with Verlet algorithm
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RESCALING VELOCITIES ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ at first, accumulate a certain number of mean_v2 ~~~~~~~~~~~~~~~
+// AGAIN, SAME COMMENTS DONE FOR LAB_04
 
 double eval_mean_v2(){
   double mean_v2 = 0;

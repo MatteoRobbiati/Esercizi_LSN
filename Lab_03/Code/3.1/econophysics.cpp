@@ -75,7 +75,7 @@ void EconoPhysics::save_Black_Scholes_solution(string filename){
 
 // ~~~~~~~~~~~~~~ concrete implementation of measure needed in blocking ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-vector<double> EconoPhysics::get_measure(){
+vector<double> EconoPhysics::get_measure(){     
     vector<double> opt = european_options(1.0);
     return opt;
 }

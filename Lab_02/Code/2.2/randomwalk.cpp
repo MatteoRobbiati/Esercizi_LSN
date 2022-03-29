@@ -105,9 +105,9 @@ vector<double> RandomWalk::get_measure(){
     }
   }
 
-  return step_distance;
+  return step_distance;              // la misura restituisce un vector
 }
 
 int RandomWalk::get_dimension(){
-  return _N;
+  return _N;                         // la misura contiene _N elementi
 }

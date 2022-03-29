@@ -116,6 +116,8 @@ void Random :: SetRandom(int * s, int p1, int p2){
 }
 
 
+// servono identificativo della distribuzione e vettore dei parametri
+
 double Random :: generate_by_inversion(const char* distribution, vector<double> par){
 
 	if(distribution=="uniform"){

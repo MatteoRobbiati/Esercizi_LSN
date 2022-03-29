@@ -40,41 +40,6 @@ void Statistic::blocking(int M, int N, Measure *measure, const char* filename){
   return;
 }
 
-/*void Statistic::blocking(int M, int N, const char* filename){
-  ofstream out;
-  out.open(filename, ios::out | ios::trunc);
-  vector<double> sum;
-  vector<double> sum2;
-
-  for(int i=0; i<N; i++){
-    vector<double> new_block = block_step(M/N);
-    sum.resize(new_block.size());
-    sum2.resize(new_block.size());
-    for(unsigned int j=0; j<new_block.size(); j++){
-      sum.at(j)+=new_block.at(j);
-      sum2.at(j)+=pow(new_block.at(j),2);
-      out << sum.at(j)/(i+1) << "   " << error(sum.at(j)/(i+1), sum2.at(j)/(i+1), i) << "   ";
-    }
-    out << endl;
-  }
-  out.close();
-  return;
-}*/
-
-
-/*vector<double> Statistic::block_step(int L){
-  vector<double> measures;
-  double meas = 0;
-  double var = 0;
-  for(int i=0; i<L; i++){
-    double rand = _rnd.Rannyu();
-    meas+=rand;
-    var+= pow((rand-0.5),2);
-  }
-  measures.push_back(meas/L);
-  measures.push_back(var/L);
-  return measures;
-}*/
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ funzioni generiche ~~~~~~~~~~~~~~~~

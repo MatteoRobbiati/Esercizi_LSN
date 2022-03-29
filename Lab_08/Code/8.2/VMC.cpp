@@ -26,10 +26,10 @@ using namespace std;
 int main(){
 
 
-  Read_input();
-  Equilibrate_system(10000);
-  Single_run(mu, sigma);
-  simulated_annealing(1., 300, 300);
+  Read_input();                        // input
+  Equilibrate_system(10000);           // equilibration
+  Single_run(mu, sigma);               // a first single run
+  simulated_annealing(1., 300, 300);   // SA in search of the best mu and sigma
 
   return 0;
 }
@@ -83,6 +83,7 @@ void Read_input(){
   in >> nblk;
   in >> nstep;
 
+// some generalities of the simulation
   if(explore==0){
     cout << "Code is running with a single evaluation of the energy. " << endl;
     cout << "It starts with the choice: (mu, sigma) = (" << mu << ", " << sigma << ")" << endl;
@@ -155,7 +156,7 @@ void Move(){
   return;
 }
 
-
+// an old method for optimization (not used here)
 void Explore(){
   double old_ene = block_e;
   double old_mu    = mu;
@@ -187,7 +188,7 @@ void Measure(bool print){
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+// same of 8.1
 double gauss(double x, double mu, double sigma){
   return exp(-(x-mu)*(x-mu)/(2.*sigma*sigma));
 }
@@ -273,32 +274,35 @@ void simulated_annealing(double betai, double betaf, int Nstep){
   double beta = betai;
   vector<double> acceptance_rate;
 
+  // Nstep of the SA, each one a different bet (T)
   for(int i=0; i<Nstep; i++){
-
+    // update beta
     beta += i;
     if(i%10 == 0) cout << "Step " << i+1 << " is running at T = " << 1/beta << endl;
 
-
+    // old parameters
     double old_mu    = mu;
     double old_sigma = sigma;
-
+    // old Energy
     Eold  = block_e;
-
+    // updating parameters
     mu   += rnd.Rannyu(-delta,delta);
     sigma += rnd.Rannyu(-delta,delta);
-
+    // a run of simulation for evaluating the <H>
     Single_run(mu, sigma);
+    // the energy is saved in block_e
     Enew = block_e;
-
+    // probability of transition in the SA algo
     p = min(1., exp((-beta)*(Enew-Eold)));
 
     if(rnd.Rannyu() < p) { cout << "acc" << endl;}
     else                 { mu=old_mu; sigma=old_sigma; block_e=Eold;}
     out << block_e << endl;
-
+    // print the combo each 100 steps
     if(i%100==0) par_out << mu << "  " << sigma << endl;
   }
 
+  // printing the final best combo
   cout << endl << "Final energy = " <<  block_e << endl;
   cout << "Final params : (mu, sigma) = (" << mu << ", " << sigma << " )" << endl;
 
@@ -310,6 +314,9 @@ void simulated_annealing(double betai, double betaf, int Nstep){
   par_out.close();
   return;
 }
+
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~ some output functions ~~~~~~~~~~~~~~~~~
 
 void print_x(string filename){
   ofstream out;

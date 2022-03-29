@@ -28,6 +28,8 @@ Integrate::~Integrate(){
   _rnd.SaveSeed();
 }
 
+// metodi da usare per concretizzare measure
+
 vector<double> Integrate::get_measure(){
     vector<double> meas;
     double sum = 0;

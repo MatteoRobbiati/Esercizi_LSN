@@ -100,31 +100,6 @@ double Statistic::chiquad(vector<double> vec, double EV, bool approx){
 }
 
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ campionamenti ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-/*double Statistic::uniform_sampling(vector<double>par){
-  return _rnd.Rannyu(int(par.at(0)),int(par.at(1)));
-}
-
-
-double Statistic::gaussian_sampling(vector<double>par){
-  double s = _rnd.Rannyu();
-  double t = _rnd.Rannyu();
-  double x=sqrt(-2.*log(1.-s))*cos(2.*M_PI*t);
-  return par.at(0) + x * par.at(1);
-}
-
-
-double Statistic::exponential_sampling(vector<double> par){
-  double	e = -(1./par.at(0))*log(1-_rnd.Rannyu());
-	return e;
-}
-
-double Statistic::lorentzian_sampling(vector<double> par){
-  double y = _rnd.Rannyu();
-  double l = tan(M_PI*(y-0.5));
-  return l;
-}*/
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TLC ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

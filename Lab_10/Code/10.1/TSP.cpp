@@ -8,6 +8,9 @@ using namespace std;
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ CONSTRUCTOR AND DISTRUCTOR ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+// COMMENTS ARE THE SAME OF LAB_09 WITH EXCEPT FOR THE SIMULATED ANNEALING METHOD
+// SOME USELESS METHODS ARE COMMENTED HERE
+
 Salesman::Salesman(int N, string circuit, Random rnd){
 
   vector<vector<double>> cities(N);
@@ -18,6 +21,7 @@ Salesman::Salesman(int N, string circuit, Random rnd){
   Prices.resize(N);
 
   for(int i=0; i<_N; i++) cities[i].resize(2);
+
 // Preparing matrix of prices
 
   ifstream load_city;
@@ -340,22 +344,25 @@ void Salesman::simulated_annealing(double betai, double betaf, int Nstep, int Nm
   ofstream out;
   out.open(nomefile);
 
+  // some variables
   double Eold, Enew, p;
   int accepted = 0, attempted = 0;
   double beta = betai;
   double dbeta = (betaf-betai)/Nstep;
   vector<double> acceptance_rate;
 
+  // Nstep loops, one for each beta (T)
   for(int i=0; i<Nstep; i++){
-
+    // updating beta
     beta += dbeta;
     if(i%99 == 0) cout << "Step " << i+1 << " is running at T = " << 1./beta << endl;
     accepted  = 0;
     attempted = 0;
-
+    // Nmoves genetic attempts
     for(int j=0; j<Nmoves; j++){
       _new_chromo = _old_chromo;
 
+      // in each one a sequence of possible gen steps
       shuffle_mutation();
       translation_mutation();
       swap_mutation();
@@ -364,6 +371,7 @@ void Salesman::simulated_annealing(double betai, double betaf, int Nstep, int Nm
       Eold = Eval_fitness(_old_chromo);
       Enew = Eval_fitness(_new_chromo);
 
+      // the SA process
       p = min(1., exp((-beta)*(Enew-Eold)));
 
       if(_rnd.Rannyu() < p) { _old_chromo = _new_chromo; accepted++; }

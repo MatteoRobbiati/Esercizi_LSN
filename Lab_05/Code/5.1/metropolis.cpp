@@ -24,7 +24,7 @@ Metropolis::~Metropolis(){
   _rnd->SaveSeed();
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ EQUILIBRATION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void Metropolis::Equilibrate(int Nequi){
   ofstream out;
@@ -38,6 +38,8 @@ void Metropolis::Equilibrate(int Nequi){
   out.close();
   return;
 }
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TRY STEP ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void Metropolis::try_step(){
 
@@ -58,6 +60,7 @@ void Metropolis::try_step(){
   return;
 }
 
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ A RUN ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void Metropolis::run(string filename){
   ofstream out;

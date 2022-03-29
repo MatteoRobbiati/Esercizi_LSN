@@ -12,8 +12,9 @@ using namespace std;
 int main(int argc, char* argv[]){
 
   // some useful variables
-
+  // for blocking
   int M = 1e7;
+  // for tuning the M(RT)^2
   double step_100 [] = {1.235, 0.75};
   double step_210 [] = {2.955, 1.85};
 
@@ -34,16 +35,17 @@ int main(int argc, char* argv[]){
 
 /*  cout << "Running Metropolis algo for simulating |100> and |210> states of hydrogen. " << endl;
 
-*/  pdf *hydrogen = new hydro_100(); /*
+  pdf *hydrogen = new hydro_100();
   Metropolis *Metro_100 = new Metropolis(M, hydrogen, start, rnd, step_100, "uniform");
   Metro_100->Equilibrate(1000);
   Metro_100->run("../../Results/H100.dat");
-  cout << "rate hydrogen |100>: " << Metro_100->rate_of_acceptance() << endl;*/
+  cout << "rate hydrogen |100>: " << Metro_100->rate_of_acceptance() << endl;
 
 //  start->set_coordinates(coord);                              // starting from the old start
 
   //2. uniform step - H100
-/*  hydrogen = new hydro_210();
+
+  hydrogen = new hydro_210();
   Metropolis *Metro_210 = new Metropolis(M, hydrogen, start, rnd, step_210, "uniform");
   Metro_210->Equilibrate(1000);
   Metro_210->run("../../Results/H210.dat");
@@ -58,17 +60,22 @@ int main(int argc, char* argv[]){
 
 
   for(int imeth=0; imeth<2; imeth++){
+    // walker at home (0,0,0)
     start->set_coordinates(coord);
 
     cout << "Running blocking for |100> and |210> using " << meth[imeth] << " steps." << endl;
+    // which p.d.f.
     hydrogen = new hydro_100();
+    // need a measure concrete implementation
     Measure *measure_100 = new Metropolis(M, hydrogen, start, rnd, step_100[imeth], meth[imeth]);
+    // output file name
     string path = "../../Results/"+meth[imeth]+"_blockin_on_100.dat";
+    // blocking for the estimation
     mystat->blocking(M, 100, measure_100, path);
-
     cout << endl;
-    start->set_coordinates(coord);
 
+    // same with the |210>
+    start->set_coordinates(coord);
     hydrogen = new hydro_210();
     Measure *measure_210 = new Metropolis(M, hydrogen, start, rnd, step_210[imeth], meth[imeth]);
     path = "../../Results/"+meth[imeth]+"_blockin_on_210.dat";

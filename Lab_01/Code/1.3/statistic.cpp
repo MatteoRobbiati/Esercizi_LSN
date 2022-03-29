@@ -35,6 +35,9 @@ void Statistic::blocking(int M, int N, const char* filename){
 }
 
 
+// ultimo esercizio in cui uso block_step
+// la misura in questo caso è la stima del pigreco fatta L volte
+
 vector<double> Statistic::block_step(int L){
   vector<double> measures;
   double d = 5;
@@ -43,7 +46,8 @@ vector<double> Statistic::block_step(int L){
   int counter = 0;
   for(int i=0; i<L; i++){
     double y_1 = _rnd.Rannyu(0,d);
-    double sin = _rnd.generate_sin_angle();
+    double sin = _rnd.generate_sin_angle();              // rapporto tra y e raggio della circ
+                                                         // concentrica a quella unitaria
     double y_2 = y_1+sin*l;
     if(y_2>d || y_2<0.) counter++;
   }
@@ -103,31 +107,7 @@ double Statistic::chiquad(vector<double> vec, double EV, bool approx){
 }
 
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ campionamenti ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-/*double Statistic::uniform_sampling(vector<double>par){
-  return _rnd.Rannyu(int(par.at(0)),int(par.at(1)));
-}
-
-
-double Statistic::gaussian_sampling(vector<double>par){
-  double s = _rnd.Rannyu();
-  double t = _rnd.Rannyu();
-  double x=sqrt(-2.*log(1.-s))*cos(2.*M_PI*t);
-  return par.at(0) + x * par.at(1);
-}
-
-
-double Statistic::exponential_sampling(vector<double> par){
-  double	e = -(1./par.at(0))*log(1-_rnd.Rannyu());
-	return e;
-}
-
-double Statistic::lorentzian_sampling(vector<double> par){
-  double y = _rnd.Rannyu();
-  double l = tan(M_PI*(y-0.5));
-  return l;
-}*/
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TLC ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
