@@ -10,4 +10,4 @@ I files di output che ho utilizzato per costruire il primo grafico erano estrema
 
 #### Una nota su alcune immagini
 Nel corso della stesura delle relazioni ho fatto uso delle funzioni `print()` di python. Ho notato che l'output non viene letto in ambiente di GitHub. Ho perciò riportato manualmente i risultati in quei casi. Per questa ragione ci sono alcune immagini caricate insieme alle cartelle già descritte.
-Un discorso simile vale per quei risultati che ho volutamente presentato in formato *.png o *.gif (Lab_11).
+Un discorso simile vale per quei risultati che ho volutamente presentato in formato *.png o *.gif (ad esempio nel Lab_11).
